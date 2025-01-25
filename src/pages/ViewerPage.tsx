@@ -1,4 +1,4 @@
-import "./styles/App.css";
+import "../styles/App.css";
 import Uploader from "../components/Uploader";
 import Viewer from "../components/Viewer";
 import { useEffect, useState } from "react";
