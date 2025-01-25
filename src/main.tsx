@@ -5,7 +5,7 @@ import { HashRouter } from "react-router";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <HashRouter>
+    <HashRouter basename="/3d-web-app/">
       <Main />
     </HashRouter>
   </React.StrictMode>
