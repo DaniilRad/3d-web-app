@@ -1,11 +1,11 @@
 import "./styles/App.css";
-import Uploader from "./components/Uploader";
-import Viewer from "./components/Viewer";
+import Uploader from "../components/Uploader";
+import Viewer from "../components/Viewer";
 import { useEffect, useState } from "react";
-import { fetchModels } from "./utils/api";
-import ModelList from "./components/ModelList";
+import { fetchModels } from "../utils/api";
+import ModelList from "../components/ModelList";
 
-function App() {
+function ViewerPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [models, setModels] = useState<{ name: string; url: string }[]>([]);
 
@@ -81,4 +81,4 @@ function App() {
   );
 }
 
-export default App;
+export default ViewerPage;

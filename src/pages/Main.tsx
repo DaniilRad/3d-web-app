@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router";
 import UploadPage from "./UploadPage";
-import App from "../App";
+import ViewerPage from "./ViewerPage";
 
 const Main = () => {
     return (
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<ViewerPage />} />
           <Route path="/upload" element={<UploadPage />} />
         </Routes>
       );

@@ -1,8 +1,7 @@
 import * as React from "react";
 import { ReactThreeFiber } from "@react-three/fiber";
-import { DirectionalLightHelper, Vector3 } from "three";
-import { Sky, useHelper } from "@react-three/drei";
-import * as THREE from "three";
+import { Vector3 } from "three";
+import { Sky } from "@react-three/drei";
 
 type Props = {
   distance?: number;
@@ -53,15 +52,15 @@ export const CustomSky: React.FC<Props> = ({
   lightDistance = 100,
   ...props
 }) => {
-  const lightRef = React.useRef<THREE.DirectionalLight>(null);
+  // const lightRef = React.useRef<THREE.DirectionalLight>(null);
 
   // Use the helper unconditionally, but it won't throw an error if `lightRef.current` is null.
-  useHelper(
-    lightRef as React.MutableRefObject<THREE.DirectionalLight>,
-    DirectionalLightHelper,
-    5,
-    "red"
-  );
+  // useHelper(
+  //   lightRef as React.MutableRefObject<THREE.DirectionalLight>,
+  //   DirectionalLightHelper,
+  //   5,
+  //   "red"
+  // );
 
   const sunPosition = calcPosFromAngles(inclination, azimuth);
   const scaledSunPosition = calcScaledSunPosition(inclination, azimuth, lightDistance);
@@ -81,7 +80,7 @@ export const CustomSky: React.FC<Props> = ({
         {...props}
       />
       <directionalLight
-        ref={lightRef}
+        // ref={lightRef}
         position={scaledSunPosition}
         intensity={5}
         castShadow

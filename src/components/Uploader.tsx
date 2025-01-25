@@ -16,7 +16,7 @@ const Uploader = ({
   const [uploadUrl, setUploadUrl] = useState<string>("");
 
   useEffect(() => {
-    setUploadUrl("http://localhost:5000/upload");
+    setUploadUrl("https://daniilrad.github.io/3d-web-app/upload");
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
