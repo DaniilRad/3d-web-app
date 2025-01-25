@@ -4,7 +4,7 @@ import ViewerPage from "./ViewerPage";
 
 const Main = () => {
   return (
-    <Router basename="/3d-web-app">
+    <Router basename="/3d-web-app/">
       <Routes>
         <Route path="/" element={<ViewerPage />} />
         <Route path="/upload" element={<UploadPage />} /> 
