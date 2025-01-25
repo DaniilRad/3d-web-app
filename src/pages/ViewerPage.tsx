@@ -4,10 +4,13 @@ import Viewer from "../components/Viewer";
 import { useEffect, useState } from "react";
 import { fetchModels } from "../utils/api";
 import ModelList from "../components/ModelList";
+import { useNavigate } from "react-router";
 
 function ViewerPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [models, setModels] = useState<{ name: string; url: string }[]>([]);
+
+  const navigate = useNavigate();
 
   const handleUploadSuccess = (uploadedUrl: string) => {
     console.log("Uploaded model URL:", uploadedUrl);
@@ -55,6 +58,7 @@ function ViewerPage() {
             <h1 className="text-lg font-bold text-center text-primary ">
               3D Model Viewer
             </h1>
+            <button onClick={() => navigate('/upload')}>About</button>
             <ModelList
               models={models}
               onModelsListChange={fetchModelsList}
