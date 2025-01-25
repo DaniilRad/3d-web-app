@@ -7,7 +7,7 @@ const Main = () => {
     <BrowserRouter basename="/3d-web-app">
       <Routes>
         <Route path="/" element={<ViewerPage />} />
-        <Route path="upload" element={<UploadPage />} /> {/* No leading slash */}
+        <Route path="/upload" element={<UploadPage />} /> 
       </Routes>
     </BrowserRouter>
   );
