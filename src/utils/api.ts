@@ -1,8 +1,10 @@
+const BASE_URL = "https://web-service-6nps.onrender.com"; // Replace with your Render service URL
+
 export const uploadModel = async (file: File) => {
   const formData = new FormData();
   formData.append("model", file);
 
-  const response = await fetch("http://localhost:5000/upload", {
+  const response = await fetch(`${BASE_URL}/api/upload`, {
     method: "POST",
     body: formData,
   });
@@ -15,7 +17,7 @@ export const uploadModel = async (file: File) => {
 };
 
 export const fetchModels = async () => {
-  const response = await fetch("http://localhost:5000/api/models");
+  const response = await fetch(`${BASE_URL}/api/load`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch models: ${response.statusText}`);
