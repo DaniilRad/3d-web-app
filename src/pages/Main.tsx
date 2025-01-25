@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router";
-import ViewerPage from "./Temp2";
-import UploadPage from "./Temp1";
+import UploadPage from "./UploadPage";
+import App from "../App";
 
 const Main = () => {
     return (
         <Routes>
-          <Route path="/upload" element={<ViewerPage />} />
-          <Route path="/" element={<UploadPage />} />
+          <Route path="/" element={<App />} />
+          <Route path="/upload" element={<UploadPage />} />
         </Routes>
       );
 };
