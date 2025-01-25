@@ -34,7 +34,7 @@ function ViewerPage() {
   useEffect(() => {
     fetchModelsList();
 
-    const ws = new WebSocket("ws://localhost:5000");
+    const ws = new WebSocket("wss://web-service-6nps.onrender.com");
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "UPLOAD") {

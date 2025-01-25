@@ -4,7 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/3d-web-app/#",
+  base: "/3d-web-app/",
   plugins: [react()],
   resolve: {
     alias: {
