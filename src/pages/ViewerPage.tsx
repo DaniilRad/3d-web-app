@@ -1,6 +1,6 @@
 import "../styles/App.css";
 import Uploader from "../components/Uploader";
-import Viewer from "../components/Viewer";
+// import Viewer from "../components/Viewer";
 import { useEffect, useState } from "react";
 import { fetchModels } from "../utils/api";
 import ModelList from "../components/ModelList";
