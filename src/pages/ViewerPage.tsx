@@ -69,6 +69,7 @@ function ViewerPage() {
             onUpload={handleUploadSuccess}
             onModelsChange={fetchModelsList}
           />
+          <span>{modelUrl}</span>
         </div>
         {/* <button
           onClick={toggleSidebar}
