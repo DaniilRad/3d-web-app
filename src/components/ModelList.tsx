@@ -54,20 +54,20 @@ const ModelList: React.FC<ModelListProps> = ({
               className="pt-1 md:basis-1/3 lg:basis-1/5"
             >
               <Card className="bg-primary text-primary-foreground shadow hover:bg-primary/90">
-                <CardContent className="p-2">
+                <CardContent className="flex flex-row p-2">
                   <button
                     className="flex items-center justify-between w-full"
                     onClick={() => onModelChange(model.url)}
                   >
                     <span>{model.name}</span>
-                    <Button
-                      variant={"destructive"}
-                      size={"icon"}
-                      onClick={() => handleDelete(model.url)}
-                    >
-                      <Delete02Icon />
-                    </Button>
                   </button>
+                  <Button
+                    variant={"destructive"}
+                    size={"icon"}
+                    onClick={() => handleDelete(model.name)}
+                  >
+                    <Delete02Icon />
+                  </Button>
                 </CardContent>
               </Card>
             </CarouselItem>

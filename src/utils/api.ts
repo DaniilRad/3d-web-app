@@ -1,6 +1,14 @@
-const BASE_URL = "https://web-service-6nps.onrender.com"; // Replace with your Render service URL
+const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://backend-3d-web-app.vercel.app"
+    : "http://localhost:5000";
 
-export const uploadModel = async (file: File) => {
+/**
+ * Upload a 3D model to the backend.
+ * @param file The 3D model file to upload (File object).
+ * @returns The URL of the uploaded model.
+ */
+export const uploadModel = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("model", file);
 
@@ -10,33 +18,44 @@ export const uploadModel = async (file: File) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to upload: ${response.statusText}`);
+    const error = await response.json();
+    throw new Error(`Failed to upload: ${error.error || response.statusText}`);
   }
+
   const data = await response.json();
   return data.url;
 };
 
-export const fetchModels = async () => {
+/**
+ * Fetch the list of 3D models from the backend.
+ * @returns An array of objects containing model names and URLs.
+ */
+export const fetchModels = async (): Promise<{ name: string; url: string }[]> => {
   const response = await fetch(`${BASE_URL}/api/load`);
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch models: ${response.statusText}`);
+    const error = await response.json();
+    throw new Error(`Failed to fetch models: ${error.error || response.statusText}`);
   }
 
   const data = await response.json();
   return data;
 };
 
-export const handleDeleteModel = async (modelUrl: string) => {
+/**
+ * Delete a 3D model from the backend.
+ * @param filename The name of the file to delete.
+ */
+export const handleDeleteModel = async (filename: string): Promise<void> => {
   try {
-    const response = await fetch(modelUrl, {
+    const response = await fetch(`${BASE_URL}/api/uploads/${filename}`, {
       method: "DELETE",
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to delete model: ${response.statusText}`);
+      const error = await response.json();
+      throw new Error(`Failed to delete model: ${error.error || response.statusText}`);
     }
-    // alert("Model deleted successfully");
   } catch (error) {
     console.error("Error deleting model:", error);
     alert("Failed to delete the model");

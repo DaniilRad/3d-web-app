@@ -34,7 +34,7 @@ function ViewerPage() {
   useEffect(() => {
     fetchModelsList();
 
-    const ws = new WebSocket("wss://web-service-6nps.onrender.com");
+    const ws = new WebSocket("http://localhost:5173/3d-web-app/");
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "UPLOAD") {
@@ -77,9 +77,9 @@ function ViewerPage() {
           {isSidebarVisible ? "Hide Menu" : "Show Menu"}
         </button> */}
         {/*  */}
-        <div className="h-full w-full">
+        {/* <div className="h-full w-full">
           <Viewer key={modelUrl} modelUrl={modelUrl} />
-        </div>
+        </div> */}
       </div>
     </>
   );
