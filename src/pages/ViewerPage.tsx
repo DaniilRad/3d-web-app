@@ -1,8 +1,8 @@
 import "../styles/App.css";
 import Uploader from "../components/Uploader";
-// import Viewer from "../components/Viewer";
+import Viewer from "../components/Viewer";
 import { useEffect, useState } from "react";
-import { fetchModels } from "../utils/api";
+import { fetchModels, testCORS } from "../utils/api";
 import ModelList from "../components/ModelList";
 import { useNavigate } from "react-router";
 
@@ -19,6 +19,7 @@ function ViewerPage() {
   };
 
   const handleChangeModel = (url: string) => {
+    console.log("Changing model to:", url);
     setModelUrl(url);
   };
 
@@ -33,54 +34,74 @@ function ViewerPage() {
 
   useEffect(() => {
     fetchModelsList();
-
-    const ws = new WebSocket("http://localhost:5173/3d-web-app/");
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === "UPLOAD") {
-        console.log("New model uploaded:", message.url);
-        fetchModelsList();
-      }
-    };
-
-    return () => {
-      ws.close();
-    };
+    testCORS();
+    // const ws = new WebSocket("ws://localhost:5000");
+  
+    // ws.onopen = () => {
+    //   console.log("WebSocket connection established");
+    // };
+  
+    // ws.onmessage = (event) => {
+    //   try {
+    //     const message = JSON.parse(event.data);
+    //     if (message.type === "UPLOAD") {
+    //       console.log("New model uploaded:", message.url);
+    //       fetchModelsList();
+    //     }
+    //   } catch (error) {
+    //     console.error("Error parsing WebSocket message:", error);
+    //   }
+    // };
+  
+    // ws.onerror = (error) => {
+    //   console.error("WebSocket error:", error);
+    // };
+  
+    // ws.onclose = (event) => {
+    //   console.log("WebSocket connection closed:", {
+    //     wasClean: event.wasClean,
+    //     code: event.code,
+    //     reason: event.reason,
+    //   });
+    // };
+  
+    // return () => {
+    //   console.log("Closing WebSocket connection");
+    //   if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+    //     console.log("Closing WebSocket connection");
+    //   }
+    // };
   }, []);
+  
 
   return (
     <>
       <div className="relative h-screen w-full flex flex-row">
-        {/* menu sidebar under comment - change */}
-
         <div className="absolute right-0 flex flex-col h-full z-10 p-4 backdrop-blur-lg bg-slate-500/20 shadow-lg border border-white/20">
           <div className="flex flex-1 flex-col items-center justify-start">
             <h1 className="text-lg font-bold text-center text-primary ">
               3D Model Viewer
             </h1>
-            <button onClick={() => navigate('/upload')}>About</button>
             <ModelList
               models={models}
               onModelsListChange={fetchModelsList}
               onModelChange={handleChangeModel}
             />
           </div>
+          <button
+            className="text-lg font-bold text-center text-primary"
+            onClick={() => navigate("/upload")}
+          >
+            Link
+          </button>
           <Uploader
             onUpload={handleUploadSuccess}
             onModelsChange={fetchModelsList}
           />
-          <span>{modelUrl}</span>
         </div>
-        {/* <button
-          onClick={toggleSidebar}
-          className="absolute top-4 right-4 z-20 px-3 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
-        >
-          {isSidebarVisible ? "Hide Menu" : "Show Menu"}
-        </button> */}
-        {/*  */}
-        {/* <div className="h-full w-full">
+        <div className="h-full w-full">
           <Viewer key={modelUrl} modelUrl={modelUrl} />
-        </div> */}
+        </div>
       </div>
     </>
   );

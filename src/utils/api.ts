@@ -8,6 +8,16 @@ const BASE_URL =
  * @param file The 3D model file to upload (File object).
  * @returns The URL of the uploaded model.
  */
+export const testCORS = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/health`);
+    const data = await response.json();
+    console.log("Test response:", data);
+  } catch (error) {
+    console.error("CORS test failed:", error);
+  }
+};
+
 export const uploadModel = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("model", file);
@@ -30,16 +40,14 @@ export const uploadModel = async (file: File): Promise<string> => {
  * Fetch the list of 3D models from the backend.
  * @returns An array of objects containing model names and URLs.
  */
-export const fetchModels = async (): Promise<{ name: string; url: string }[]> => {
-  const response = await fetch(`${BASE_URL}/api/load`);
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Failed to fetch models: ${error.error || response.statusText}`);
+export const fetchModels = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/load`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching models:", error);
   }
-
-  const data = await response.json();
-  return data;
 };
 
 /**
@@ -47,6 +55,8 @@ export const fetchModels = async (): Promise<{ name: string; url: string }[]> =>
  * @param filename The name of the file to delete.
  */
 export const handleDeleteModel = async (filename: string): Promise<void> => {
+  if (!window.confirm(`Are you sure you want to delete ${filename}?`)) return;
+
   try {
     const response = await fetch(`${BASE_URL}/api/uploads/${filename}`, {
       method: "DELETE",
@@ -54,10 +64,39 @@ export const handleDeleteModel = async (filename: string): Promise<void> => {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to delete model: ${error.error || response.statusText}`);
+      throw new Error(
+        `Failed to delete model: ${error.error || response.statusText}`
+      );
     }
+    alert("Model deleted successfully!");
+
   } catch (error) {
     console.error("Error deleting model:", error);
     alert("Failed to delete the model");
+  }
+};
+
+/**
+ * Load a 3D model from the backend.
+ * @param filename The name of the file to delete.
+ */
+export const handleLoadModel = async (filename: string | null) => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/uploads/${filename}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `Failed to load model: ${error.error || response.statusText}`
+      );
+    }
+
+    if (!data.url) throw new Error("Invalid model URL received");
+    return data.url;
+
+  } catch (error) {
+    console.error("Error loading model:", error);
+    alert("Failed to load the model");
   }
 };

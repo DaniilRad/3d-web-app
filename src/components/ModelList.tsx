@@ -57,7 +57,7 @@ const ModelList: React.FC<ModelListProps> = ({
                 <CardContent className="flex flex-row p-2">
                   <button
                     className="flex items-center justify-between w-full"
-                    onClick={() => onModelChange(model.url)}
+                    onClick={() => onModelChange(model.name)}
                   >
                     <span>{model.name}</span>
                   </button>

@@ -1,11 +1,37 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
 import { CustomSky } from "./CustomSky";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Box3, Vector3 } from "three";
+import { handleLoadModel } from "../utils/api";
 
 const Viewer = ({ modelUrl }: { modelUrl: string | null }) => {
-  console.log("Model URL in Viewer:", modelUrl);
+  const [awsUrl, setAwsUrl] = useState("");
+  const [previousUrl, setPreviousUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!modelUrl) return; // Prevent fetching if modelUrl is null
+
+    const fetchModel = async () => {
+      try {
+        const loadedUrl = await handleLoadModel(modelUrl);
+        if (loadedUrl) {
+          setPreviousUrl(awsUrl); // Store the current model before updating
+          setAwsUrl(loadedUrl);
+        }
+      } catch (error) {
+        console.error("Error loading model:", error);
+      }
+    };
+
+    fetchModel();
+
+    return () => {
+      if (previousUrl) {
+        useGLTF.clear(previousUrl); // ✅ Clear only the old model after switching
+      }
+    };
+  }, [modelUrl]);
 
   return (
     <Canvas
@@ -26,32 +52,27 @@ const Viewer = ({ modelUrl }: { modelUrl: string | null }) => {
       />
       <CustomSky />
       <Stage preset={"upfront"} intensity={2} environment={"city"}>
-        <Suspense>{!modelUrl ? <mesh /> : <Model url={modelUrl} />}</Suspense>
+        <Suspense>
+          {!awsUrl ? <mesh /> : <Model key={awsUrl} url={awsUrl} />}
+        </Suspense>
       </Stage>
     </Canvas>
   );
 };
 
 const Model = ({ url }: { url: string }) => {
-  // try {
-  const gltf = useGLTF(url);
+  const { scene } = useGLTF(url);
 
-  console.log("GLTF:", gltf);
-
-  // console.log("GLTF successfully loaded:", gltf);
-
-  // Calculate the bounding box and adjust scale
-  const box = new Box3().setFromObject(gltf.scene);
+  const box = new Box3().setFromObject(scene);
   const size = new Vector3();
   box.getSize(size);
 
   const maxDimension = Math.max(size.x, size.y, size.z);
-  const scaleFactor = 10 / maxDimension; // Scale to a max dimension of 10
-  gltf.scene.scale.set(scaleFactor, scaleFactor, scaleFactor);
+  const scaleFactor = 10 / maxDimension;
+  scene.scale.set(scaleFactor, scaleFactor, scaleFactor);
+  scene.position.set(0, -size.y / 2, 0);
 
-  gltf.scene.position.set(0, -size.y / 2, 0); // Center the model vertically
-
-  return <primitive object={gltf.scene} />;
+  return <primitive object={scene} />;
 };
 
 export default Viewer;

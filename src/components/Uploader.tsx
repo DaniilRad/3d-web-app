@@ -16,7 +16,7 @@ const Uploader = ({
   const [uploadUrl, setUploadUrl] = useState<string>("");
 
   useEffect(() => {
-    setUploadUrl("https://daniilrad.github.io/3d-web-app/#/upload");
+    setUploadUrl("3d-web-app-three.vercel.app/upload");
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +42,7 @@ const Uploader = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-center">
-        <QRCode value={uploadUrl} />
+        <QRCode value={uploadUrl} size={100} level="H"/>
       </div>
       <InputFile
         onChange={handleFileChange}
