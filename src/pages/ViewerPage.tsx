@@ -77,6 +77,7 @@ function ViewerPage() {
   return (
     <>
       <div className="relative h-full w-full flex flex-row">
+        
         <div className="absolute right-0 flex flex-col h-full z-10 p-4 backdrop-blur-lg bg-slate-500/20 shadow-lg border border-white/20">
           <div className="flex flex-1 flex-col items-center justify-start">
             <h1 className="text-lg font-bold text-center text-primary ">
