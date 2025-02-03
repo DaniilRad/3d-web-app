@@ -29,7 +29,7 @@ const ModelPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setUploadUrl("https://3d-web-app-three.vercel.app//#/models");
+    setUploadUrl("https://3d-web-app-three.vercel.app//#/upload");
     setAwsUrl("/camel.glb");
   }, []);
 
