@@ -169,7 +169,7 @@ const UploadPage = () => {
         >
           <span className="absolute inset-0 bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg"></span>
           <ThreeDMoveIcon className="relative z-10 text-mediumGray" size={48} />
-          <div className="relative z-10 text-2xl sm:text-6xl mm:text-3xl font-bold text-mediumGray">3D Web App</div>
+          <div className="relative z-10 lg:text-2xl sm:text-6xl mm:text-3xl font-bold text-mediumGray">3D Web App</div>
         </button>
 
         {/* ✅ Desktop: Show Buttons, Mobile: Hide Buttons */}
@@ -200,7 +200,7 @@ const UploadPage = () => {
 
         {/* ✅ Desktop: Show Drag & Drop */}
         <div
-          className="relative w-[60vw] sm:h-[15vh] h-[30vh] rounded-lg items-center justify-center text-mediumGray text-lg cursor-pointer transition-all duration-300 overflow-hidden group backdrop-blur-2xl flex"
+          className="relative lg:w-[60vw] lg:h-[30vh] sm:w-[50vh] sm:h-[15vh] mm:w-[60vw] mm:h-[60vw] rounded-lg items-center justify-center text-mediumGray text-lg cursor-pointer transition-all duration-300 overflow-hidden group backdrop-blur-2xl flex"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
@@ -224,7 +224,7 @@ const UploadPage = () => {
             />
           </svg>
 
-          <p className="relative z-10 text-center mm:hidden">
+          <p className="relative z-10 text-center mm:hidden lg:inline">
             {file ? (
               <span>
                 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
@@ -233,7 +233,7 @@ const UploadPage = () => {
               "Drag & Drop"
             )}
           </p>
-          <p className="relative z-10 text-center lg:hidden">
+          <p className="relative z-10 text-center lg:hidden sm:text-3xl mm:text-lg">
             {file ? (
               <span>
                 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
@@ -246,13 +246,13 @@ const UploadPage = () => {
 
         {/* ✅ Mobile: Only Show File Upload & Upload Button */}
         <div className="w-full flex flex-row justify-center items-center gap-[20px] lg:py-[10px]">
-          <label className="inline-block px-[10px] py-2 rounded-xl bg-transparent text-xl sm:text-3xl text-mediumGray hover:text-deepBlack cursor-pointer relative overflow-hidden group transition-all duration-300">
+          <label className="inline-block px-[10px] py-2 rounded-xl bg-transparent lg:text-xl sm:text-3xl text-mediumGray hover:text-deepBlack cursor-pointer relative overflow-hidden group transition-all duration-300">
             <span className="relative z-10">Choose File</span>
             <div className="absolute inset-0 bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
             <input type="file" className="hidden" onChange={handleFileChange} />
           </label>
           <button
-            className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl sm:text-3xl transition-all duration-300 group"
+            className="p-[10px] relative overflow-hidden rounded-xl bg-transparent lg:text-xl sm:text-3xl transition-all duration-300 group"
             onClick={() => navigate("/models")}
           >
             <span className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300">
