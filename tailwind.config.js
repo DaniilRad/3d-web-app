@@ -18,6 +18,13 @@ export default {
       backgroundImage: {
         'neon-gradient': "linear-gradient(to right, #12C2E9, #C471ED, #F64F59)",
       },
+      screens: {
+        mm: "0px", // Minimum
+        sm: "640px", // Mobile
+        md: "768px", // Tablet
+        lg: "1024px", // Laptop
+        xl: "1280px", // Large screens
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

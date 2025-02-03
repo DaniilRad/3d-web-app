@@ -41,7 +41,7 @@ const ModelPage = () => {
         alt="vawe"
       />
       {/* NavBar */}
-      <div className="w-full flex justify-between items-center px-[50px] py-[28px]">
+      <div className="relative w-full flex justify-between items-center px-[50px] py-[28px]">
         <button
           onClick={() => navigate("/")}
           className="group flex flex-row gap-[10px] px-[10px] items-center cursor-pointer rounded-lg relative overflow-hidden"
@@ -96,7 +96,7 @@ const ModelPage = () => {
       </div>
 
       {/* Footer */}
-      <div className="w-full h-fit flex justify-center items-center gap-[100px] px-[50px] py-[20px]">
+      <div className="relative w-full h-fit flex justify-center items-center gap-[100px] px-[50px] py-[20px]">
         {/* QR Code Gradient */}
         <div className="relative">
           <svg width="0" height="0">
@@ -123,7 +123,7 @@ const ModelPage = () => {
             bgColor="transparent"
           />
         </div>
-        <span className="w-[65vw] text-sm text-left">
+        <span className="w-[65vw] text-sm font-bold text-left">
           Scan the QR code to quickly upload your 3D models directly from your
           device. No complicated steps—just scan, select your file, and upload
           it instantly. Your model will be processed and available for viewing
