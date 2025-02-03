@@ -2,6 +2,7 @@ import { Route, Routes, HashRouter as Router } from "react-router";
 import MainPage from "./MainPage";
 import ModelPage from "./ModelPage";
 import UploadPage from "./UploadPage2";
+import ManagePage from "./ManagePage";
 
 const Main = () => {
   return (
@@ -10,7 +11,7 @@ const Main = () => {
         {/* <Route path="/" element={<ViewerPage />} /> */}
         <Route path="/" element={<MainPage />} />
         <Route path="/models" element={<ModelPage />} />
-        {/* <Route path="/manage" element={<ManagePage />} /> */}
+        <Route path="/manage" element={<ManagePage />} />
         <Route path="/upload" element={<UploadPage />} /> 
       </Routes>
     </Router>

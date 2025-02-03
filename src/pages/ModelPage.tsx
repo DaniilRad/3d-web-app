@@ -60,7 +60,7 @@ const ModelPage = () => {
           <button className="p-[10px] relative overflow-hidden rounded-xl bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 text-xl transition-all duration-300 group" onClick={() => navigate("/models")}>
             <span className="relative z-10 text-deepBlack">View Models</span>
           </button>
-          <button className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl transition-all duration-300 group" onClick={() => navigate("/upload")}>
+          <button className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl transition-all duration-300 group" onClick={() => navigate("/manage")}>
             <span className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300">
               Manage Models
             </span>

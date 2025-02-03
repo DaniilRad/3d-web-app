@@ -97,7 +97,7 @@ const UploadPage = () => {
           </button>
           <button
             className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl transition-all duration-300 group"
-            onClick={() => navigate("/upload")}
+            onClick={() => navigate("/manage")}
           >
             <span className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300">
               Manage Models
