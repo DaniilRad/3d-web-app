@@ -1,4 +1,4 @@
-import { uploadModel } from "@/utils/api";
+import { getPresignedPost, uploadFileToS3 } from "@/utils/api";
 import { ThreeDMoveIcon } from "hugeicons-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
@@ -10,7 +10,8 @@ const UploadPage = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      console.log("changed file" + event.target.files[0]);
+      console.log("file: " + event.target.files[0]);
+      console.log("file type: " + event.target.files[0].type);
       setFile(event.target.files[0]);
     }
   };
@@ -25,14 +26,29 @@ const UploadPage = () => {
   const handleUpload = async () => {
     if (!file) return;
 
+    let fileType = file.type;
+
+    // 🛠 If fileType is missing (e.g., `.glb` files), create a new file with the correct MIME type
+    const updatedFile = (!fileType || file.name.endsWith(".glb"))
+      ? new File([file], file.name, { type: "model/gltf-binary" }) // ✅ Create a copy
+      : file; // ✅ Use the original file if type is valid
+  
+    console.log("Uploading file:", updatedFile.name, "Type:", updatedFile.type);
+
     try {
-      await uploadModel(file);
+      setStatus("Requesting pre-signed URL...");
+      const presignedPost = await getPresignedPost(updatedFile);
+
+      setStatus("Uploading to S3...");
+      const fileUrl = await uploadFileToS3(updatedFile, presignedPost);
+
+      setStatus(`Upload successful! File URL: ${fileUrl}`);
+
       setFile(null);
       const fileInput = document.getElementById(
         "file-upload"
       ) as HTMLInputElement;
       if (fileInput) fileInput.value = "";
-      setStatus("Upload successful!");
     } catch (error) {
       console.error("Error uploading model:", error);
       setStatus("Upload failed. Please try again.");
@@ -59,7 +75,10 @@ const UploadPage = () => {
           className="group flex flex-row gap-[10px] px-[10px] items-center cursor-pointer rounded-lg relative overflow-hidden sm:pointer-events-none mm:pointer-events-none lg:pointer-events-auto"
         >
           <span className="absolute inset-0 bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg"></span>
-          <ThreeDMoveIcon className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300" size={48} />
+          <ThreeDMoveIcon
+            className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300"
+            size={48}
+          />
           <div className="relative z-10 lg:text-2xl sm:text-6xl mm:text-3xl font-bold text-mediumGray group-hover:text-deepBlack transition-all duration-300 group-hover:font-semibold">
             3D Web App
           </div>

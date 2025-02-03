@@ -36,6 +36,52 @@ export const uploadModel = async (file: File): Promise<string> => {
   return data.url;
 };
 
+export const getPresignedPost = async (file: File): Promise<any> => {
+  const response = await fetch(`${BASE_URL}/api/get-presigned-post`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: file.name,
+      fileType: file.type,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get pre-signed URL");
+  }
+
+  const { presignedPost } = await response.json();
+  return presignedPost;
+};
+
+// 📌 **Upload File to S3 Using the Pre-Signed URL**
+export const uploadFileToS3 = async (file: File, presignedPost: any): Promise<string> => {
+  console.log("Pre-Signed URL Data:", presignedPost);
+
+  const formData = new FormData();
+  Object.entries(presignedPost.fields).forEach(([key, value]) => {
+    formData.append(key, value as string);
+  });
+
+  formData.append("Content-Type", file.type); // ✅ Ensure Content-Type matches
+  formData.append("file", file);
+
+  console.log("Uploading file to:", presignedPost.url);
+  console.log("Form Data:", formData);
+
+  const uploadResponse = await fetch(presignedPost.url, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!uploadResponse.ok) {
+    console.error("Upload Failed:", await uploadResponse.text());
+    throw new Error("Failed to upload file to S3");
+  }
+
+  return `${presignedPost.url}/${presignedPost.fields.key}`;
+};
+
 /**
  * Fetch the list of 3D models from the backend.
  * @returns An array of objects containing model names and URLs.
