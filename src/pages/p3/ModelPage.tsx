@@ -8,7 +8,7 @@ import { CustomSky } from "@/components/CustomSky";
 import { fetchModels } from "@/utils/api";
 import { a, useTransition } from "@react-spring/three";
 
-const CHANGE_INTERVAL = 10; // Change model every 10 seconds
+const CHANGE_INTERVAL = 20; // Change model every 10 seconds
 
 // ✅ Preload models before rendering
 const preloadModel = (url: string) => {
@@ -73,10 +73,16 @@ const ModelPage = () => {
       const data = await fetchModels();
       setModels(data);
       if (data.length > 0) {
+        // Pick a random starting model
         const randomIndex = Math.floor(Math.random() * data.length);
         setSelectedModel(data[randomIndex]);
-
-        const nextIndex = (randomIndex + 1) % data.length;
+  
+        // Pick a random next model that is different from the first one
+        let nextIndex;
+        do {
+          nextIndex = Math.floor(Math.random() * data.length);
+        } while (nextIndex === randomIndex); // Ensure it's not the same
+  
         setNextModel(data[nextIndex]);
         preloadModel(data[nextIndex].url);
       }
