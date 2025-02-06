@@ -1,18 +1,22 @@
 import { Route, Routes, HashRouter as Router } from "react-router";
-import MainPage from "./MainPage";
-import ModelPage from "./ModelPage";
-import UploadPage from "./UploadPage2";
-import ManagePage from "./ManagePage";
+import ModelPage from "./p3/ModelPage";
+import UploadPage from "./p3/UploadPage";
 
 const Main = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<ViewerPage />} /> */}
-        <Route path="/" element={<MainPage />} />
+        //* 1. Prototyp 
+        {/* <Route path="/" element={<MainPage />} />
         <Route path="/models" element={<ModelPage />} />
         <Route path="/manage" element={<ManagePage />} />
-        <Route path="/upload" element={<UploadPage />} /> 
+        <Route path="/upload" element={<UploadPage />} />  */}
+
+        //* 2. Prototyp
+        <Route path="/" element={<ModelPage />} />
+        <Route path="/upload" element={<UploadPage />} />
+        {/* <Route path="/controller" element={} /> */}
+        
       </Routes>
     </Router>
   );

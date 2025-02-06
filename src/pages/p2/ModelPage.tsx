@@ -1,4 +1,4 @@
-import "../styles/App.css";
+import "/src/styles/App.css";
 import { ThreeDMoveIcon } from "hugeicons-react";
 import { Suspense, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
@@ -7,6 +7,7 @@ import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
 import { Box3, Vector3 } from "three";
 import { CustomSky } from "@/components/CustomSky";
 import { useNavigate } from "react-router";
+import { fetchModels, handleLoadModel } from "@/utils/api";
 
 const Model = ({ url }: { url: string }) => {
   const { scene } = useGLTF(url);
@@ -25,12 +26,36 @@ const Model = ({ url }: { url: string }) => {
 
 const ModelPage = () => {
   const [uploadUrl, setUploadUrl] = useState<string>("");
-  const [awsUrl, setAwsUrl] = useState<string>("");
+  const [models, setModels] = useState<{ name: string; url: string }[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const handleLoad = async () => {
+    if (!selectedModel) {
+      alert("Please select a model first.");
+      return;
+    }
+
+    try {
+      const modelUrl = await handleLoadModel(selectedModel);
+
+      if (modelUrl) {
+        setUploadUrl(modelUrl);
+      }
+    } catch (error) {
+      console.error("Error loading model:", error);
+    }
+  };
 
   useEffect(() => {
     setUploadUrl("https://3d-web-app-three.vercel.app//#/upload");
-    setAwsUrl("/camel.glb");
+     setUploadUrl("/camel.glb");
+    const loadModels = async () => {
+      const data = await fetchModels();
+      setModels(data);
+      if (data.length > 0) setSelectedModel(data[0].url); // Default to first model
+    };
+    loadModels();
   }, []);
 
   return (
@@ -41,7 +66,7 @@ const ModelPage = () => {
         alt="vawe"
       />
       {/* NavBar */}
-      <div className="relative w-full flex justify-between items-center px-[50px] py-[28px]">
+      {/* <div className="relative w-full flex justify-between items-center px-[50px] py-[28px]">
         <button
           onClick={() => navigate("/")}
           className="group flex flex-row gap-[10px] px-[10px] items-center cursor-pointer rounded-lg relative overflow-hidden"
@@ -57,14 +82,56 @@ const ModelPage = () => {
         </button>
 
         <div className="flex gap-[20px] px-[10px]">
-          <button className="p-[10px] relative overflow-hidden rounded-xl bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 text-xl transition-all duration-300 group" onClick={() => navigate("/models")}>
+          <button
+            className="p-[10px] relative overflow-hidden rounded-xl bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 text-xl transition-all duration-300 group"
+            onClick={() => navigate("/models")}
+          >
             <span className="relative z-10 text-deepBlack">View Models</span>
           </button>
-          <button className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl transition-all duration-300 group" onClick={() => navigate("/manage")}>
+          <button
+            className="p-[10px] relative overflow-hidden rounded-xl bg-transparent text-xl transition-all duration-300 group"
+            onClick={() => navigate("/manage")}
+          >
             <span className="relative z-10 text-mediumGray group-hover:text-deepBlack transition-all duration-300">
               Manage Models
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-[#12C2E9]/75 via-[#C471ED]/75 to-[#F64F59]/75 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+          </button>
+        </div>
+      </div> */}
+
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 p-4 rounded-lg backdrop-blur-md shadow-lg z-50">
+        <span className="text-lg text-center font-bold text-deepBlack mb-2 block">
+          Models
+        </span>
+        <div className="flex flex-col gap-2">
+          {models.length > 0 ? (
+            models.map((model) => (
+              <button
+                key={model.url}
+                onClick={() => setSelectedModel(model.url)}
+                className={`px-4 py-2 rounded-md text-deepBlack transition-all duration-300 ${
+                  selectedModel === model.url
+                    ? "bg-gradient-to-r from-[#12C2E9] via-[#C471ED] to-[#F64F59]"
+                    : "hover:bg-white/20"
+                }`}
+              >
+                {model.name}
+              </button>
+            ))
+          ) : (
+            <span className="text-sm text-gray-300">No models found</span>
+          )}
+        </div>
+        <div className="flex justify-center">
+          <button
+            className="p-[10px] relative overflow-hidden rounded-xl bg-transparent lg:text-xl sm:text-3xl transition-all duration-300 group"
+            onClick={handleLoad}
+          >
+            <span className="relative z-10 text-deepBlack group-hover:text-deepBlack transition-all duration-300">
+              Load
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#12C2E9] via-[#C471ED] to-[#F64F59] opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
           </button>
         </div>
       </div>
@@ -89,7 +156,9 @@ const ModelPage = () => {
           <CustomSky />
           <Stage preset={"upfront"} intensity={2} environment={"city"}>
             <Suspense>
-              {!awsUrl ? <mesh /> : <Model key={awsUrl} url={awsUrl} />}
+            <Model key={uploadUrl} url={uploadUrl} />
+              {/* <mesh />
+              {!awsUrl ? <mesh /> : <Model key={awsUrl} url={awsUrl} />} */}
             </Suspense>
           </Stage>
         </Canvas>

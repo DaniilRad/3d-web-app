@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { uploadModel } from "../utils/api";
-import { Button } from "../components/ui/button";
+import { uploadModel } from "../../utils/api";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
+} from "../../components/ui/card";
 import { InputFile } from "@/components/ui/inputfile";
 
 const UploadPage = () => {
