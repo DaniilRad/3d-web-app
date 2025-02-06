@@ -65,9 +65,7 @@ const ModelPage = () => {
     name: string;
     url: string;
   } | null>(null);
-  const [uploadUrl, setUploadUrl] = useState<string>(
-    "http://localhost:5173/#/upload"
-  );
+  const uploadUrl = "http://localhost:5173/#/upload";
   const [countdown, setCountdown] = useState<number>(CHANGE_INTERVAL);
 
   useEffect(() => {
