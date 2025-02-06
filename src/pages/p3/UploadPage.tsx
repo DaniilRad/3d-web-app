@@ -1,10 +1,7 @@
 import { getPresignedPost, uploadFileToS3 } from "@/utils/api";
-import { ThreeDMoveIcon } from "hugeicons-react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
 const UploadPage = () => {
-  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
 

@@ -1,9 +1,9 @@
 import "/src/styles/App.css";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
-import { Box3, Euler, Vector3 } from "three";
+import { Box3, Vector3 } from "three";
 import { CustomSky } from "@/components/CustomSky";
 import { fetchModels } from "@/utils/api";
 import { a, useTransition } from "@react-spring/three";

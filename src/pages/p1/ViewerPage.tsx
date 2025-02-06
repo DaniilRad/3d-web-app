@@ -1,9 +1,9 @@
 import "../styles/App.css";
-import Uploader from "../components/Uploader";
-import Viewer from "../components/Viewer";
+import Uploader from "@/components/Uploader";
+import Viewer from "@/components/Viewer";
 import { useEffect, useState } from "react";
-import { fetchModels, testCORS } from "../utils/api";
-import ModelList from "../components/ModelList";
+import { fetchModels, testCORS } from "@/utils/api";
+import ModelList from "@/components/ModelList";
 import { useNavigate } from "react-router";
 
 function ViewerPage() {

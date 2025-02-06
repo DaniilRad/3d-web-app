@@ -1,12 +1,10 @@
 import "/src/styles/App.css";
-import { ThreeDMoveIcon } from "hugeicons-react";
 import { Suspense, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
 import { Box3, Vector3 } from "three";
 import { CustomSky } from "@/components/CustomSky";
-import { useNavigate } from "react-router";
 import { fetchModels, handleLoadModel } from "@/utils/api";
 
 const Model = ({ url }: { url: string }) => {
@@ -28,7 +26,6 @@ const ModelPage = () => {
   const [uploadUrl, setUploadUrl] = useState<string>("");
   const [models, setModels] = useState<{ name: string; url: string }[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const handleLoad = async () => {
     if (!selectedModel) {
