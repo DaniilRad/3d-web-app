@@ -65,7 +65,8 @@ const ModelPage = () => {
     name: string;
     url: string;
   } | null>(null);
-  const uploadUrl = "http://localhost:5173/#/upload";
+  // const uploadUrl = "http://localhost:5173/#/upload";
+  const uploadUrl = "https://3d-web-app-three.vercel.app/upload";
   const [countdown, setCountdown] = useState<number>(CHANGE_INTERVAL);
 
   useEffect(() => {
