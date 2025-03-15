@@ -199,11 +199,6 @@ export default function ModelPage() {
 
   return (
     <div className="bg-deepBlack relative flex h-screen flex-col">
-      {/* <img
-        className={"absolute inset-0 h-full w-full"}
-        src="/vawe.png"
-        alt="vawe"
-      /> */}
       <div className="text-mediumGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
         <button
           onClick={() =>
@@ -259,15 +254,15 @@ export default function ModelPage() {
           <ambientLight />
           <directionalLight
             ref={directionalLightRef}
-            position={[15, 15, 0]}
+            position={[15, 30, 0]}
             color={0xffffff}
-            intensity={5}
+            intensity={6}
           />
-          {directionalLightRef.current && (
+          {/* {directionalLightRef.current && (
             <directionalLightHelper
               args={[directionalLightRef.current, 2, 0xff0000]}
             />
-          )}
+          )} */}
           <Suspense
             fallback={
               <mesh>
