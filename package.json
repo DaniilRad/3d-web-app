@@ -15,6 +15,7 @@
     "@tailwindcss/vite": "^4.0.12",
     "@types/lodash": "^4.17.16",
     "lodash": "^4.17.21",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.3.0",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",

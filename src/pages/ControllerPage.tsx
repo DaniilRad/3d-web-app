@@ -3,12 +3,30 @@ import { io } from "socket.io-client";
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stage } from "@react-three/drei";
-import { throttle } from "lodash";
 
 const Model = () => {
+  const [size, setSize] = useState(2); // Default sphere size
+
+  useEffect(() => {
+    // Function to calculate sphere size based on screen width
+    const updateSize = () => {
+      const width = window.innerWidth;
+      if (width < 600)
+        setSize(1); // Small devices
+      else if (width < 1024)
+        setSize(1.5); // Tablets
+      else setSize(2); // Larger screens
+    };
+
+    updateSize(); // Run on mount
+    window.addEventListener("resize", updateSize); // Listen for changes
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   return (
     <mesh castShadow={false} receiveShadow={true}>
-      <sphereGeometry args={[2, 30, 30]} />
+      <sphereGeometry args={[size, 30, 30]} />
       <meshStandardMaterial color="blue" wireframe={false} />
     </mesh>
   );
@@ -45,7 +63,7 @@ const CameraSync = ({ cameraRef }: { cameraRef: any }) => {
     };
   }, []);
 
-  const sendCameraUpdate = throttle(() => {
+  const sendCameraUpdate = () => {
     if (hasControl && cameraRef.current) {
       const updateData = {
         position: cameraRef.current.position.toArray(),
@@ -53,7 +71,7 @@ const CameraSync = ({ cameraRef }: { cameraRef: any }) => {
       };
       socket.emit("camera_update", updateData);
     }
-  }, 50); // Sends updates every 50ms
+  };
 
   useFrame(() => {
     if (hasControl) sendCameraUpdate();
@@ -67,8 +85,9 @@ export default function ControllerPage() {
   const cameraRef = useRef<any>(null);
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-row gap-4 bg-gray-100 p-4">
+    <div className="bg-deepBlack relative flex h-screen flex-col">
+      {/* <LavaLampBackground /> */}
+      <div className="text-mediumGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
         <button
           onClick={() => navigate("/")}
           className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
@@ -77,9 +96,16 @@ export default function ControllerPage() {
         </button>
       </div>
 
-      <Canvas className="flex-1 bg-gray-500">
+      <Canvas className="z-40 flex-1">
         <PerspectiveCamera ref={cameraRef} makeDefault position={[15, 15, 0]} />
-        <OrbitControls autoRotate={true} minDistance={10} />
+        <OrbitControls
+          autoRotate={true}
+          enableZoom={false}
+          enablePan={false}
+          minDistance={10}
+          minPolarAngle={Math.PI / 6} // 30° minimum angle (prevents under-floor views)
+          maxPolarAngle={Math.PI / 2} // 90° maximum angle (prevents top-down views)
+        />
         <pointLight
           position={[10, 10, 10]}
           castShadow={false}
