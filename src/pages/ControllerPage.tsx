@@ -103,8 +103,11 @@ export default function ControllerPage() {
           enableZoom={false}
           enablePan={false}
           minDistance={10}
-          minPolarAngle={Math.PI / 6} // 30° minimum angle (prevents under-floor views)
-          maxPolarAngle={Math.PI / 2} // 90° maximum angle (prevents top-down views)
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2}
+          rotateSpeed={1.5}
+          dampingFactor={0.05}
+          enableDamping={true}
         />
         <pointLight
           position={[10, 10, 10]}
