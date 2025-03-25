@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router";
 import { io } from "socket.io-client";
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -81,19 +80,13 @@ const CameraSync = ({ cameraRef }: { cameraRef: any }) => {
 };
 
 export default function ControllerPage() {
-  const navigate = useNavigate();
   const cameraRef = useRef<any>(null);
 
   return (
     <div className="bg-deepBlack relative flex h-screen flex-col">
       {/* <LavaLampBackground /> */}
-      <div className="text-mediumGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
-        <button
-          onClick={() => navigate("/")}
-          className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
-        >
-          Model
-        </button>
+      <div className="text-mediumGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-center gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+        Click and drag around the sphere to rotate the camera around the model.
       </div>
 
       <Canvas className="z-40 flex-1">
