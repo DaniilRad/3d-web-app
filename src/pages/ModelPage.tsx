@@ -5,7 +5,6 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { QRCodeSVG } from "qrcode.react";
 import io from "socket.io-client";
 import * as THREE from "three";
-import LavaLampBackground from "../components/LavaBackground";
 
 const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
   autoConnect: true,
@@ -92,7 +91,6 @@ const Model: React.FC<ModelProps> = ({ url, preload = false }) => {
 
 export default function ModelPage() {
   const cameraRef = useRef<any>(null);
-  const directionalLightRef = useRef(null);
   const [models, setModels] = useState<string[]>([]);
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -212,28 +210,28 @@ export default function ModelPage() {
   }, []);
 
   return (
-    <div className="relative flex h-screen flex-col">
+    <div className="bg-deepBlack relative flex h-screen flex-col">
       <div className="text-lightGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
         <button
           onClick={() =>
             window.open(window.location.href + "control", "_blank")
           }
-          className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
+          className="rounded-lg border border-gray-400 px-4 py-2 text-white transition hover:border-gray-700"
         >
           Controls
         </button>
         <select
-          className="rounded-lg border border-gray-400 p-2"
+          className="rounded-lg border border-gray-400 p-2 px-4 text-white transition hover:border-gray-700"
           value={currentModelIndex}
           onChange={(e) => setCurrentModelIndex(Number(e.target.value))}
         >
           {models.map((_model, index) => (
-            <option key={index} value={index}>
+            <option key={index} value={index} className="bg-deepBlack">
               Model {index + 1}
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-2 rounded-lg border border-gray-400 p-2 px-4 text-white transition hover:border-gray-700">
           <input
             type="checkbox"
             checked={autoSwitch}
@@ -242,7 +240,6 @@ export default function ModelPage() {
           Auto-Switch
         </label>
       </div>
-      <LavaLampBackground />
       <div className="z-40 flex-1">
         <Canvas>
           <PerspectiveCamera
@@ -262,16 +259,10 @@ export default function ModelPage() {
           />
           <ambientLight />
           <directionalLight
-            ref={directionalLightRef}
-            position={[15, 15, 0]}
+            position={[15, 15, 5]}
             color={0xffffff}
-            intensity={5}
+            intensity={7}
           />
-          {directionalLightRef.current && (
-            <directionalLightHelper
-              args={[directionalLightRef.current, 2, 0xff0000]}
-            />
-          )}
           <Suspense
             fallback={
               <mesh>
@@ -292,7 +283,7 @@ export default function ModelPage() {
           </Suspense>
         </Canvas>
       </div>
-      <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+      <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full items-center justify-evenly px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
         {/* QR Code Gradient */}
         <div className="relative">
           <svg width="0" height="0">
@@ -319,12 +310,47 @@ export default function ModelPage() {
             bgColor="transparent"
           />
         </div>
-        <span className="w-[65vw] text-left text-sm font-bold">
-          Scan the QR code to quickly upload your 3D models directly from your
-          device. No complicated steps—just scan, select your file, and upload
-          it instantly. Your model will be processed and available for viewing
-          in the 3D web app.
-        </span>
+        <div className="relative">
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient
+                id="qr-gradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stopColor="#12C2E9" />
+                <stop offset="50%" stopColor="#C471ED" />
+                <stop offset="100%" stopColor="#F64F59" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <QRCodeSVG
+            value={window.location.href + "upload"}
+            size={80}
+            level="H"
+            fgColor="url(#qr-gradient)"
+            bgColor="transparent"
+          />
+        </div>
+        <div className="flex w-[70%] flex-row items-center justify-center gap-4">
+          <p className="text-sm">
+            Scan one of the QR codes with your device to interact with the 3D
+            web app.
+          </p>
+          <p className="text-sm">
+            Use the first QR code to take control and rotate the model in real
+            time.
+          </p>
+          <p className="text-sm">
+            Use the second QR code to quickly upload your 3D models from your
+            device. No complicated steps—just scan, select your file, and upload
+            it instantly. Your model will be processed and become available for
+            viewing in the app.
+          </p>
+        </div>
       </div>
     </div>
   );

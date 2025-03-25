@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router";
 import { io } from "socket.io-client";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
   autoConnect: true,
@@ -15,18 +15,30 @@ socket.on("disconnect", (reason) =>
 );
 
 export default function UploadPage() {
-  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>("");
 
   // 🔹 Handle file selection
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && (file.name.endsWith(".glb") || file.name.endsWith(".gltf"))) {
+  const handleFileChange = (file: File | null) => {
+    if (!file) {
+      // User cleared the file – don't show error
+      setSelectedFile(null);
+      setUploadStatus("");
+      return;
+    }
+
+    const isValid =
+      file.name.endsWith(".glb") ||
+      file.name.endsWith(".gltf") ||
+      file.name.endsWith(".stl");
+
+    if (isValid) {
       setSelectedFile(file);
-      setUploadStatus(""); // Reset status on new file selection
+      setUploadStatus("");
     } else {
-      setUploadStatus("❌ Invalid file type! Only .glb or .gltf allowed.");
+      setUploadStatus(
+        "❌ Invalid file type! Only .glb or .gltf or .stl allowed.",
+      );
       setSelectedFile(null);
     }
   };
@@ -74,21 +86,10 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-row gap-4 bg-gray-100 p-4">
-        <button
-          onClick={() => navigate("/")}
-          className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
-        >
-          Model
-        </button>
-
+    <div className="font-tech-mono bg-deepBlack text-lightGray flex h-screen flex-col items-center justify-center">
+      <div className="m-10 flex w-[50%] flex-col gap-4">
         {/* 🔹 File Upload Input */}
-        <input
-          type="file"
-          accept=".glb,.gltf .stl"
-          onChange={handleFileChange}
-        />
+        <Input onFileSelect={handleFileChange} />
 
         {/* 🔹 Upload Button */}
         <button
@@ -96,8 +97,8 @@ export default function UploadPage() {
           disabled={!selectedFile}
           className={`rounded-lg px-4 py-2 transition ${
             selectedFile
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "cursor-not-allowed bg-gray-300 text-gray-500"
+              ? "rounded-lg border border-gray-400 px-4 py-2 text-white transition hover:border-gray-700"
+              : "cursor-not-allowed rounded-lg border border-gray-800 px-4 py-2 text-gray-800 transition"
           }`}
         >
           Upload Model
