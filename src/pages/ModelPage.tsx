@@ -5,6 +5,7 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { QRCodeSVG } from "qrcode.react";
 import io from "socket.io-client";
 import * as THREE from "three";
+import LavaLampBackground from "../components/LavaBackground";
 
 const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
   autoConnect: true,
@@ -197,14 +198,22 @@ export default function ModelPage() {
     };
   }, []);
 
+  useEffect(() => {
+    socket.on("settings_update", (data) => {
+      let enableZoom,
+        enablePan = { data };
+      console.log("Enable Zoom: " + enableZoom);
+      console.log("Enable Pan: " + enablePan);
+    });
+
+    return () => {
+      socket.off("camera_update");
+    };
+  }, []);
+
   return (
-    <div className="bg-deepBlack relative flex h-screen flex-col">
-      {/* <img
-        className={"absolute inset-0 h-full w-full"}
-        src="/vawe.png"
-        alt="vawe"
-      /> */}
-      <div className="text-mediumGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+    <div className="relative flex h-screen flex-col">
+      <div className="text-lightGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-start gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
         <button
           onClick={() =>
             window.open(window.location.href + "control", "_blank")
@@ -212,12 +221,6 @@ export default function ModelPage() {
           className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
         >
           Controls
-        </button>
-        <button
-          onClick={() => window.open(window.location.href + "upload", "_blank")}
-          className="rounded-lg bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
-        >
-          Upload
         </button>
         <select
           className="rounded-lg border border-gray-400 p-2"
@@ -239,6 +242,7 @@ export default function ModelPage() {
           Auto-Switch
         </label>
       </div>
+      <LavaLampBackground />
       <div className="z-40 flex-1">
         <Canvas>
           <PerspectiveCamera
@@ -253,8 +257,8 @@ export default function ModelPage() {
             enableDamping={false}
             enableZoom={false}
             minDistance={10}
-            minPolarAngle={Math.PI / 6} // 30° minimum angle (prevents under-floor views)
-            maxPolarAngle={Math.PI / 2} // 90° maximum angle (prevents top-down views)
+            minPolarAngle={Math.PI / 6}
+            maxPolarAngle={Math.PI / 2}
           />
           <ambientLight />
           <directionalLight

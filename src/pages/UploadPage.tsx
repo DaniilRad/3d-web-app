@@ -84,7 +84,11 @@ export default function UploadPage() {
         </button>
 
         {/* 🔹 File Upload Input */}
-        <input type="file" accept=".glb,.gltf" onChange={handleFileChange} />
+        <input
+          type="file"
+          accept=".glb,.gltf .stl"
+          onChange={handleFileChange}
+        />
 
         {/* 🔹 Upload Button */}
         <button
