@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { color } from "three/src/nodes/TSL.js";
 
 export const { DEG2RAD } = THREE.MathUtils;
 export const DEGREES_THETA = [
