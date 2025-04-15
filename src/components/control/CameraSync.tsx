@@ -8,6 +8,7 @@ export const CameraSync = ({ hasControl }: { hasControl: boolean }) => {
       socket.emit("camera_update", {
         position: camera.position.toArray(),
         rotation: camera.quaternion.toArray(),
+        zoom: camera.zoom,
       });
     }
   });

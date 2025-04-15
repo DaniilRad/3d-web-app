@@ -13,10 +13,10 @@ export const SelectModel = ({
   setCurrentModelIndex,
 }: {
   models: string[];
-  setCurrentModelIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentModelIndex: (index: number) => void;
 }) => {
   return (
-    <div className="text-lightGray font-tech-mono absolute top-0 left-0 z-50 flex w-full items-center justify-center gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+    <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
       <Select
         onValueChange={(value) => setCurrentModelIndex(models.indexOf(value))}
       >

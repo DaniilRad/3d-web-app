@@ -13,6 +13,9 @@ import {
   DEGREES_THETA,
 } from "../utils/Constants";
 import { socket } from "@/pages/ControlPage";
+import { Slider } from "../ui/slider";
+import { ColorPicker } from "../ui/color-picker";
+import { SelectModel } from "../model/SelectModel";
 
 const SidebarAndModal = ({
   hasControl,
@@ -27,11 +30,15 @@ const SidebarAndModal = ({
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
+  const [models, setModels] = useState<string[]>([]);
+  const [currentModelIndex, setCurrentModelIndex] = useState(0);
 
   // Camera control settings
   const [settings, setSettings] = useState({
     lightIntensity: 2,
     autoSwitch: true,
+    lightColor: "#ffffff",
+    currentModelIndex: currentModelIndex,
   });
 
   const [settingsCamera, setSettingsCamera] = useState({
@@ -39,6 +46,10 @@ const SidebarAndModal = ({
     rotateSpeed: 0.005,
     minDistance: 10,
   });
+
+  const updateCurrentModelIndex = (index: number) => {
+    updateSetting("currentModelIndex", index);
+  };
 
   const updateSetting = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -82,6 +93,30 @@ const SidebarAndModal = ({
   };
 
   useEffect(() => {
+    // ✅ Initial fetch when the page loads
+    socket.emit("get_files");
+
+    socket.on("files_list", (fileList: { name: string; url: string }[]) => {
+      const modelUrls = fileList
+        .filter(
+          (file) =>
+            file.name.endsWith(".glb") ||
+            file.name.endsWith(".gltf") ||
+            file.name.endsWith(".stl"),
+        )
+        .map((file) => file.url);
+
+      if (modelUrls.length > 0) {
+        setModels(modelUrls);
+      }
+    });
+
+    return () => {
+      socket.off("files_list");
+    };
+  }, []);
+
+  useEffect(() => {
     if (hasControl) {
       socket.emit("settings_update", settings);
     }
@@ -90,25 +125,26 @@ const SidebarAndModal = ({
   useEffect(() => {
     if (hasControl) {
       socket.emit("settings_update_local", settingsCamera);
-      console.log("Settings local send");
+      // console.log("Settings local send");
     }
   }, [settingsCamera, hasControl]);
 
   return (
     <>
       {/* Sidebar Toggle Button */}
-      <button
-        className="absolute top-4 left-4 z-40 rounded-md bg-gray-700 p-2 text-white"
-        onClick={() => setSidebarOpen(true)}
-      >
-        <Menu size={24} />
-      </button>
-
+      {!sidebarOpen && (
+        <button
+          className="absolute top-4 left-4 z-40 rounded-md bg-gray-700 p-2 text-white"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu size={24} />
+        </button>
+      )}
       {/* Settings Sidebar */}
       <div
-        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 bg-gray-800/80 p-6 backdrop-blur-[15px] backdrop-saturate-[100%] transition-all duration-300 ${
+        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 p-6 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%] transition-all duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } w-full sm:w-80`}
+        } w-full sm:w-100`}
       >
         <div className="flex justify-between">
           <h2 className="text-lg font-semibold">Camera Controls</h2>
@@ -119,7 +155,7 @@ const SidebarAndModal = ({
 
         <div className="flex w-full flex-col items-center justify-center space-y-4">
           {/* Camera Control Buttons */}
-          <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-2">
             {/* Divider */}
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
 
@@ -207,88 +243,100 @@ const SidebarAndModal = ({
 
           {/* Camera Settings */}
           <div className="mt-4 w-full space-y-2 text-center">
-            <div className="flex flex-row-reverse items-center justify-end gap-4">
-              <Checkbox
-                id="autoSwitch"
-                checked={settings.autoSwitch}
-                onCheckedChange={(checked) => {
-                  updateSetting("autoSwitch", checked);
-                  console.log("Auto Switch:", checked);
-                }}
-              />
-              <label
-                htmlFor="autoSwitch"
-                className="text-lightGray leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Auto-Change
-              </label>
-            </div>
+            <div className="flex flex-row justify-around gap-2">
+              <div className="flex flex-row-reverse items-center justify-end gap-4">
+                <Checkbox
+                  id="autoSwitch"
+                  checked={settings.autoSwitch}
+                  onCheckedChange={(checked) => {
+                    updateSetting("autoSwitch", checked);
+                    console.log("Auto Switch:", checked);
+                  }}
+                />
+                <label
+                  htmlFor="autoSwitch"
+                  className="text-lightGray leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Auto-Change
+                </label>
+              </div>
 
-            <div className="flex flex-row-reverse items-center justify-end gap-4">
-              <Checkbox
-                id="autoRotate"
-                checked={settingsCamera.autoRotate}
-                onCheckedChange={(checked) => {
-                  updateSettingCamera("autoRotate", checked);
-                  console.log("Auto Rotate:", checked);
-                }}
-              />
-              <label
-                htmlFor="autoRotate"
-                className="text-lightGray leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Auto-Rotate
-              </label>
+              <div className="flex flex-row-reverse items-center justify-end gap-4">
+                <Checkbox
+                  id="autoRotate"
+                  checked={settingsCamera.autoRotate}
+                  onCheckedChange={(checked) => {
+                    updateSettingCamera("autoRotate", checked);
+                    console.log("Auto Rotate:", checked);
+                  }}
+                />
+                <label
+                  htmlFor="autoRotate"
+                  className="text-lightGray leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Auto-Rotate
+                </label>
+              </div>
             </div>
-
-            <label className="flex items-center justify-center gap-2 text-white">
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
               Rotate Speed: {settingsCamera.rotateSpeed.toFixed(3)}
-              <input
-                type="range"
-                min="0.005"
-                max="0.05"
-                step="0.005"
-                value={settingsCamera.rotateSpeed}
-                onChange={(e) =>
-                  updateSettingCamera("rotateSpeed", parseFloat(e.target.value))
+              <Slider
+                min={0.005}
+                max={0.05}
+                step={0.005}
+                value={[settingsCamera.rotateSpeed]}
+                onValueChange={(value) =>
+                  updateSettingCamera("rotateSpeed", value[0])
                 }
-                className="w-full"
               />
             </label>
-            <label className="flex items-center justify-center gap-2 text-white">
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
               Min Distance: {settingsCamera.minDistance.toFixed(1)}
-              <input
-                type="range"
-                min="1"
-                max="20"
-                step="0.5"
-                value={settingsCamera.minDistance}
-                onChange={(e) =>
-                  updateSettingCamera("minDistance", parseFloat(e.target.value))
+              <Slider
+                min={1}
+                max={20}
+                step={0.5}
+                value={[settingsCamera.minDistance]}
+                onValueChange={(value) =>
+                  updateSettingCamera("minDistance", value[0])
                 }
-                className="w-full"
               />
             </label>
-            <label className="flex items-center justify-center gap-2 text-white">
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
               Light Intensity: {settings.lightIntensity.toFixed(1)}
-              <input
-                type="range"
-                min="0"
-                max="10"
-                step="0.1"
-                value={settings.lightIntensity}
-                onChange={(e) =>
-                  updateSetting("lightIntensity", parseFloat(e.target.value))
+              <Slider
+                min={0}
+                max={10}
+                step={0.1}
+                value={[settings.lightIntensity]}
+                onValueChange={(value) =>
+                  updateSetting("lightIntensity", value[0])
                 }
-                className="w-full"
               />
             </label>
           </div>
+          {/* Color picker */}
+          <div className="flex flex-row gap-4">
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
+              Light Color: {settings.lightColor}
+            </label>
+            <ColorPicker
+              value={settings.lightColor}
+              onChange={(v) => {
+                updateSetting("lightColor", v);
+              }}
+            />
+          </div>
+          <SelectModel
+            models={models}
+            setCurrentModelIndex={updateCurrentModelIndex}
+          />
 
           {/* Reset Camera Button */}
           <Button
             onClick={onResetCamera}
-            className="mt-4 w-full bg-gray-500 text-white hover:bg-gray-600"
+            className="hover:bg-lightGray mt-4 w-full text-white hover:text-black"
+            variant="outline"
           >
             Reset Camera
           </Button>
@@ -297,7 +345,8 @@ const SidebarAndModal = ({
           {hasControl && (
             <Button
               onClick={() => setUploadModalOpen(true)}
-              className="mt-4 w-full"
+              className="hover:bg-lightGray mt-4 w-full text-white hover:text-black"
+              variant="outline"
             >
               Upload Model
             </Button>
