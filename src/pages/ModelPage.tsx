@@ -13,7 +13,6 @@ import * as THREE from "three";
 import { TORUS_COMBINATIONS } from "@/components/utils/Constants";
 
 import Footer from "@/components/model/Footer";
-import { SelectModel } from "@/components/model/SelectModel";
 import { TorusLoad } from "@/components/model/TorusLoad";
 
 import { Ground } from "@/components/regular/Ground";
@@ -121,13 +120,18 @@ export default function ModelPage() {
   const [autoSwitch, setAutoSwitch] = useState(true);
   const switchInterval = 5000;
 
-  useEffect(() => {
-    // Ensure the camera is facing the model (look at the center of the scene)
-    if (cameraRef.current) {
-      cameraRef.current.position.set(15, 15, 0); // Camera position
-      cameraRef.current.lookAt(0, 0, 0); // Look at the origin where the model is centered
-    }
-  }, [currentModelIndex]);
+  if (cameraRef.current) {
+    cameraRef.current.position.set(15, 15, 0); // Camera position
+    cameraRef.current.lookAt(0, 0, 0); // Look at the origin where the model is centered
+  }
+
+  // useEffect(() => {
+  //   // Ensure the camera is facing the model (look at the center of the scene)
+  //   if (cameraRef.current) {
+  //     cameraRef.current.position.set(15, 15, 0); // Camera position
+  //     cameraRef.current.lookAt(0, 0, 0); // Look at the origin where the model is centered
+  //   }
+  // }, [currentModelIndex]);
 
   useEffect(() => {
     const handleModelUploaded = (file: {

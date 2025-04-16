@@ -31,14 +31,13 @@ const SidebarAndModal = ({
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
   const [models, setModels] = useState<string[]>([]);
-  const [currentModelIndex, setCurrentModelIndex] = useState(0);
 
   // Camera control settings
   const [settings, setSettings] = useState({
     lightIntensity: 2,
     autoSwitch: true,
     lightColor: "#ffffff",
-    currentModelIndex: currentModelIndex,
+    currentModelIndex: 0,
   });
 
   const [settingsCamera, setSettingsCamera] = useState({
