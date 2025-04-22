@@ -27,6 +27,7 @@ const SidebarAndModal = ({
   onResetCamera: () => void;
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [author, setAuthor] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
@@ -58,10 +59,16 @@ const SidebarAndModal = ({
     setSettingsCamera((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleMetadata = (selectedFile: File | null, author: string) => {
+    setSelectedFile(selectedFile); // Set the selected file
+    setAuthor(author); // Set the author
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploadStatus("📤 Uploading...");
-
+    console.log("Author: ", author);
+    // Emit request for a presigned URL to upload the file
     socket.emit("request_presigned_url", {
       fileName: selectedFile.name,
       fileType: selectedFile.type,
@@ -71,13 +78,15 @@ const SidebarAndModal = ({
       try {
         const response = await fetch(uploadUrl, {
           method: "PUT",
-          body: selectedFile,
+          body: selectedFile, // Upload the selected file
           headers: { "Content-Type": selectedFile.type },
         });
 
         if (response.ok) {
           setUploadStatus("✅ Upload successful!");
-          socket.emit("upload_complete", { fileName });
+          console.log("Authir2: ", author);
+          // Emit upload complete, passing the fileName and author (from state)
+          socket.emit("upload_complete", { fileName, author: author });
         } else {
           throw new Error("Upload failed");
         }
@@ -368,7 +377,7 @@ const SidebarAndModal = ({
                 hidden
               />
             </div>
-            <FileUpload onFileSelect={setSelectedFile} />
+            <FileUpload onFileSelect={handleMetadata} />
 
             <Button
               onClick={handleUpload}
@@ -377,7 +386,11 @@ const SidebarAndModal = ({
             >
               Upload
             </Button>
-            {uploadStatus && <p className="mt-2 text-sm">{uploadStatus}</p>}
+            {uploadStatus && (
+              <p className="mt-2 flex items-center justify-center text-sm">
+                {uploadStatus}
+              </p>
+            )}
             <Button
               onClick={() => {
                 setUploadModalOpen(false);

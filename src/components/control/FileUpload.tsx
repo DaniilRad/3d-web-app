@@ -2,11 +2,12 @@ import { X } from "lucide-react";
 import { useState } from "react";
 
 interface FileUploadProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (file: File, author: string) => void;
 }
 
 export default function FileUpload({ onFileSelect }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [author, setAuthor] = useState<string>(""); // Store the author name
   const [error, setError] = useState<string | null>(null);
   const MAX_SIZE_MB = 25;
 
@@ -29,7 +30,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
       } else {
         setError(null);
         setFile(selectedFile);
-        onFileSelect(selectedFile); // ✅ Correctly using the function passed as a prop
+        onFileSelect(selectedFile, author || "Anonymous"); // Pass author as "Anonymous" if empty
       }
     }
   };
@@ -71,6 +72,15 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
       >
         Select File
       </label>
+
+      {/* Author Input */}
+      <input
+        type="text"
+        placeholder="Enter Author Name (optional)"
+        value={author}
+        onChange={(e) => setAuthor(e.target.value)}
+        className="text-mediumGray mt-2 w-full rounded border p-2 text-sm"
+      />
 
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
