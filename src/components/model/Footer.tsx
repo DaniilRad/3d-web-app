@@ -2,8 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 const Footer = () => {
   return (
-    <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full items-center justify-around px-4 py-6 backdrop-blur-[5px] backdrop-saturate-[100%]">
-      {/* QR Code Gradient */}
+    <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full items-center justify-between gap-6 bg-black/50 px-14 py-6 backdrop-blur-[30px] backdrop-saturate-[120%]">
       <div className="relative">
         <svg width="0" height="0">
           <defs>
@@ -29,7 +28,7 @@ const Footer = () => {
           bgColor="transparent"
         />
       </div>
-      <span className="w-[65vw] text-left text-sm font-bold">
+      <span className="text-left text-sm">
         Scan the QR code to quickly upload your 3D models directly from your
         device. No complicated steps—just scan, select your file, and upload it
         instantly. Your model will be processed and available for viewing in the

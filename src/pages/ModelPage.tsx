@@ -1,4 +1,10 @@
-import { Center, PerspectiveCamera, Preload } from "@react-three/drei";
+import {
+  Center,
+  PerspectiveCamera,
+  Preload,
+  Sky,
+  useHelper,
+} from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, {
   Suspense,
@@ -152,7 +158,12 @@ const Model: React.FC<ModelProps> = ({
         <Preload />
         <group ref={groupRef}>
           {model instanceof THREE.BufferGeometry ? (
-            <mesh geometry={model} material={material} />
+            <mesh
+              geometry={model}
+              material={material}
+              castShadow
+              receiveShadow
+            />
           ) : (
             <primitive object={model} />
           )}
@@ -165,7 +176,13 @@ const Model: React.FC<ModelProps> = ({
 const Light = React.memo(() => {
   const [lightIntensity, setLightIntensity] = useState(2);
   const [lightColor, setLightColor] = useState(0xbbbaaa);
-
+  const lightRef = useRef<THREE.DirectionalLight>(null);
+  useHelper(
+    lightRef as React.RefObject<THREE.Object3D>,
+    THREE.DirectionalLightHelper,
+    4,
+    "green",
+  );
   useEffect(() => {
     socket.on("settings_update", (data) => {
       // console.log("Settings updated:", data);
@@ -180,11 +197,21 @@ const Light = React.memo(() => {
   }, []);
 
   return (
-    <directionalLight
-      position={[15, 15, 0]}
-      color={lightColor}
-      intensity={lightIntensity}
-    />
+    <>
+      <ambientLight
+        intensity={lightIntensity * 2}
+        color={lightColor}
+        castShadow
+      />
+      <directionalLight
+        castShadow
+        ref={lightRef}
+        color={"#ffffff"}
+        intensity={lightIntensity}
+        position={[10, 10, 0]}
+      />
+      <Sky azimuth={0.9} inclination={0.5} rayleigh={2} />
+    </>
   );
 });
 
@@ -330,6 +357,7 @@ export default function ModelPage() {
     socket.on("settings_update", (data) => {
       // console.log("Settings updated:", data);
       setAutoSwitch(data.autoSwitch);
+      console.log("Auto switch:", data.autoSwitch);
       console.log("Model index:", data.currentModelIndex);
       setCurrentModelIndex(data.currentModelIndex);
     });
@@ -338,14 +366,9 @@ export default function ModelPage() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log("Models: ", models);
-  //   console.log("Current Model Index: ", currentModelIndex);
-  // }, [models, currentModelIndex]);
-
   return (
-    <div className="bg-deepBlack relative flex h-screen flex-col">
-      <div className="text-lightGray font-tech-mono absolute flex w-full flex-col items-center justify-center gap-2 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+    <div className="relative flex h-screen flex-col">
+      <div className="font-tech-mono text-mediumGray absolute z-50 flex h-fit w-full flex-row items-center justify-center gap-10 bg-black/50 px-4 py-6 backdrop-blur-[30px] backdrop-saturate-[120%]">
         <p>Author: {models[currentModelIndex]?.author || "Unknown"}</p>
         <p>Model: {models[currentModelIndex]?.name || "Unknown"}</p>
       </div>
@@ -353,8 +376,8 @@ export default function ModelPage() {
       <div className="z-40 flex-1">
         <Canvas>
           <PerspectiveCamera ref={cameraRef} makeDefault zoom={1} />
+          {/* <Sky azimuth={1} inclination={0.5} rayleigh={3} ref={skyRef} /> */}
           <Light />
-          <ambientLight />
           <Suspense fallback={<TorusLoad colors={TORUS_COMBINATIONS.color1} />}>
             {!loading && models.length > 0 ? (
               <Model url={models[currentModelIndex].url} />

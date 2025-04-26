@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../../server/websocket-server"
+		},
+		{
+			"path": "../../../../../Praca/thesis"
+		},
+		{
+			"path": "../../../../../../24-25"
+		}
+	],
+	"settings": {}
+}

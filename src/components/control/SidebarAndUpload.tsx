@@ -35,7 +35,7 @@ const SidebarAndModal = ({
 
   // Camera control settings
   const [settings, setSettings] = useState({
-    lightIntensity: 2,
+    lightIntensity: 4,
     autoSwitch: true,
     lightColor: "#ffffff",
     currentModelIndex: 0,

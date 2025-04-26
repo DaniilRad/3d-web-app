@@ -55,6 +55,7 @@ export const Scene = ({
         <CameraControls
           ref={cameraControlsRef}
           minDistance={settings.minDistance}
+          maxDistance={80}
           enabled={true}
           dollyToCursor={false}
           onStart={() => (isDraggingRef.current = true)}
