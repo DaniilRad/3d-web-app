@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 const Footer = () => {
   return (
-    <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full items-center justify-between gap-6 bg-black/50 px-14 py-6 backdrop-blur-[30px] backdrop-saturate-[120%]">
+    <div className="text-mediumGray font-tech-mono absolute bottom-0 left-0 z-50 flex w-full flex-row items-center justify-between gap-14 bg-black/50 p-4 backdrop-blur-[30px] backdrop-saturate-[120%]">
       <div className="relative">
         <svg width="0" height="0">
           <defs>
@@ -22,18 +22,20 @@ const Footer = () => {
 
         <QRCodeSVG
           value={window.location.href + "control"}
-          size={80}
+          size={90}
           level="H"
           fgColor="url(#qr-gradient)"
           bgColor="transparent"
         />
       </div>
-      <span className="text-left text-sm">
-        Scan the QR code to quickly upload your 3D models directly from your
-        device. No complicated steps—just scan, select your file, and upload it
-        instantly. Your model will be processed and available for viewing in the
-        3D web app.
-      </span>
+      <div>
+        <span className="text-[1.5rem] text-balance">
+          Scan the QR code to quickly upload your 3D models directly from your
+          device. No complicated steps—just scan, select your file, and upload
+          it instantly. Your model will be processed and available for viewing
+          in the 3D web app.
+        </span>
+      </div>
     </div>
   );
 };

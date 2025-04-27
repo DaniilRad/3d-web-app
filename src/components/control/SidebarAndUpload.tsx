@@ -64,6 +64,10 @@ const SidebarAndModal = ({
     setAuthor(author); // Set the author
   };
 
+  const handleFileRemove = () => {
+    setSelectedFile(null);
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploadStatus("📤 Uploading...");
@@ -142,7 +146,7 @@ const SidebarAndModal = ({
       {/* Sidebar Toggle Button */}
       {!sidebarOpen && (
         <button
-          className="absolute top-4 left-4 z-40 rounded-md bg-gray-700 p-2 text-white"
+          className="bg-deepBlack/60 absolute top-4 left-4 z-40 rounded-md p-2 text-white backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%]"
           onClick={() => setSidebarOpen(true)}
         >
           <Menu size={24} />
@@ -161,7 +165,7 @@ const SidebarAndModal = ({
           </button>
         </div>
 
-        <div className="flex w-full flex-col items-center justify-center space-y-4">
+        <div className="flex w-full flex-col items-center justify-center space-y-2">
           {/* Camera Control Buttons */}
           <div className="grid w-full grid-cols-1 gap-2">
             {/* Divider */}
@@ -250,7 +254,7 @@ const SidebarAndModal = ({
           </div>
 
           {/* Camera Settings */}
-          <div className="mt-4 w-full space-y-2 text-center">
+          <div className="mt-2 w-full space-y-4 text-center">
             <div className="flex flex-row justify-around gap-2">
               <div className="flex flex-row-reverse items-center justify-end gap-4">
                 <Checkbox
@@ -343,7 +347,7 @@ const SidebarAndModal = ({
           {/* Reset Camera Button */}
           <Button
             onClick={onResetCamera}
-            className="hover:bg-lightGray mt-4 w-full text-white hover:text-black"
+            className="hover:bg-lightGray w-full text-white hover:text-black"
             variant="outline"
           >
             Reset Camera
@@ -365,7 +369,7 @@ const SidebarAndModal = ({
       {/* Upload Modal */}
       {uploadModalOpen && (
         <div className="font-tech-mono fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[15px] backdrop-saturate-[100%]">
-          <div className="w-[90%] max-w-md rounded-lg bg-gray-800/80 p-6 shadow-lg">
+          <div className="bg-deepBlack/90 border-lightGray w-[60%] max-w-md rounded-lg border p-6 shadow-lg">
             <h1 className="text-mediumGray text-center text-lg font-semibold">
               Upload Model
             </h1>
@@ -377,9 +381,13 @@ const SidebarAndModal = ({
                 hidden
               />
             </div>
-            <FileUpload onFileSelect={handleMetadata} />
+            <FileUpload
+              onFileSelect={handleMetadata}
+              onFileRemove={handleFileRemove}
+            />
 
             <Button
+              variant="outline"
               onClick={handleUpload}
               disabled={!selectedFile}
               className="text-mediumGray w-full"
@@ -392,6 +400,7 @@ const SidebarAndModal = ({
               </p>
             )}
             <Button
+              variant="outline"
               onClick={() => {
                 setUploadModalOpen(false);
                 setSelectedFile(null);

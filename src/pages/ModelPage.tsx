@@ -177,12 +177,12 @@ const Light = React.memo(() => {
   const [lightIntensity, setLightIntensity] = useState(2);
   const [lightColor, setLightColor] = useState(0xbbbaaa);
   const lightRef = useRef<THREE.DirectionalLight>(null);
-  useHelper(
-    lightRef as React.RefObject<THREE.Object3D>,
-    THREE.DirectionalLightHelper,
-    4,
-    "green",
-  );
+  // useHelper(
+  //   lightRef as React.RefObject<THREE.Object3D>,
+  //   THREE.DirectionalLightHelper,
+  //   4,
+  //   "green",
+  // );
   useEffect(() => {
     socket.on("settings_update", (data) => {
       // console.log("Settings updated:", data);
@@ -368,7 +368,7 @@ export default function ModelPage() {
 
   return (
     <div className="relative flex h-screen flex-col">
-      <div className="font-tech-mono text-mediumGray absolute z-50 flex h-fit w-full flex-row items-center justify-center gap-10 bg-black/50 px-4 py-6 backdrop-blur-[30px] backdrop-saturate-[120%]">
+      <div className="font-tech-mono text-mediumGray absolute z-50 flex h-fit w-full flex-row items-center justify-center gap-10 bg-black/50 px-4 py-6 text-[2rem] backdrop-blur-[30px] backdrop-saturate-[120%]">
         <p>Author: {models[currentModelIndex]?.author || "Unknown"}</p>
         <p>Model: {models[currentModelIndex]?.name || "Unknown"}</p>
       </div>

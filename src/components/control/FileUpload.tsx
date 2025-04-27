@@ -3,9 +3,13 @@ import { useState } from "react";
 
 interface FileUploadProps {
   onFileSelect: (file: File, author: string) => void;
+  onFileRemove: () => void;
 }
 
-export default function FileUpload({ onFileSelect }: FileUploadProps) {
+export default function FileUpload({
+  onFileSelect,
+  onFileRemove,
+}: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [author, setAuthor] = useState<string>(""); // Store the author name
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +40,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
   };
 
   return (
-    <div className="mb-4 flex flex-col items-center space-y-4">
+    <div className="mb-4 flex flex-col items-center space-y-2">
       {file ? (
         <div className="flex w-full items-center justify-between">
           <p className="text-mediumGray text-sm">
@@ -46,6 +50,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
             onClick={() => {
               setFile(null);
               setError(null);
+              onFileRemove();
             }}
             className="flex h-full items-center justify-center"
           >
@@ -68,7 +73,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
 
       <label
         htmlFor="fileInput"
-        className="text-mediumGray w-full cursor-pointer rounded-lg border-[1px] px-3 py-2 text-center text-sm transition"
+        className="text-mediumGray hover:bg-lightGray hover:text-deepBlack w-full rounded-lg border-[1px] px-3 py-2 text-center text-sm transition"
       >
         Select File
       </label>
@@ -79,7 +84,7 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
         placeholder="Enter Author Name (optional)"
         value={author}
         onChange={(e) => setAuthor(e.target.value)}
-        className="text-mediumGray mt-2 w-full rounded border p-2 text-sm"
+        className="text-lightGray mt-2 w-full rounded-md border p-2 text-sm"
       />
 
       {error && <p className="text-sm text-red-500">{error}</p>}
