@@ -1,10 +1,4 @@
-import {
-  Center,
-  PerspectiveCamera,
-  Preload,
-  Sky,
-  useHelper,
-} from "@react-three/drei";
+import { Center, PerspectiveCamera, Preload, Sky } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, {
   Suspense,
