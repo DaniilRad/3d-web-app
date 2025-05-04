@@ -15,5 +15,7 @@ export const GroundPreset: React.FC<GroundPresetProps> = ({ preset }) => {
 
   const textureUrl = presetTextures[preset] || presetTextures["grass"];
 
+  console.log(textureUrl);
+
   return <GroundTexture textureUrl={""} />;
 };

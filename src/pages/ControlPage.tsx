@@ -43,14 +43,16 @@ export default function ControllerPage() {
 
   return (
     <div className="bg-deepBlack relative flex h-screen">
-      {showModal && <ControlsModal setShowModal={setShowModal} />}
+      <div className="absolute top-[50%] -right-0 z-50 h-20 w-20 bg-amber-300 sm:bg-amber-600 md:bg-amber-900 lg:bg-blue-300 xl:bg-blue-600 2xl:bg-blue-900" />
+
+      {/* {showModal && <ControlsModal setShowModal={setShowModal} />} */}
       <SidebarAndUpload
         hasControl={hasControl}
         cameraControlsRef={cameraControlsRef}
         onResetCamera={resetCamera}
       />
-      <div className="absolute top-0 right-0 z-10 w-[20%] p-6">
-        <img src={img} alt="logo" className="sm:w-[80%] xl:w-full" />
+      <div className="absolute top-0 right-0 z-10 p-6">
+        <img src={img} alt="logo" className="w-[6rem] sm:w-[8rem]" />
       </div>
 
       <Canvas shadows camera={{ position: [15, 15, 0], fov: 60 }}>

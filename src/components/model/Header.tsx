@@ -14,12 +14,12 @@ export const Header: React.FC<HeaderProps> = ({
   countdown,
 }) => {
   return (
-    <div className="font-tech-mono text-mediumGray text-md absolute z-50 flex h-[5rem] w-full flex-row items-center justify-center gap-2 bg-black/50 backdrop-blur-[30px] backdrop-saturate-[120vh] sm:h-[6rem] sm:text-lg md:h-[6em] md:text-2xl lg:h-[14rem] lg:text-4xl xl:h-[16rem] xl:text-5xl 2xl:h-[16rem]">
-      <div className="flex h-full flex-1 items-center justify-start">
+    <div className="font-tech-mono text-mediumGray text-md absolute z-50 flex h-[5rem] w-full flex-row items-center justify-center gap-2 bg-black/50 backdrop-blur-[30px] backdrop-saturate-[120vh] sm:h-[6rem] sm:text-lg md:h-[6rem] md:text-2xl lg:h-[8rem] lg:text-4xl xl:h-[6rem] xl:text-3xl 2xl:h-[14rem]">
+      <div className="flex-1">
         <img
           src={img}
           alt="Logo"
-          className="h-full w-full sm:w-[14rem] md:w-[20rem] lg:w-[24rem] xl:w-[28rem] 2xl:w-[30rem]"
+          className="w-[6rem] sm:w-[8rem] lg:w-[10rem] xl:w-[13rem] 2xl:w-[16rem]"
         />
       </div>
       <div className="flex flex-3 flex-col items-center justify-center">
