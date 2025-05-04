@@ -14,9 +14,13 @@ export const Header: React.FC<HeaderProps> = ({
   countdown,
 }) => {
   return (
-    <div className="font-tech-mono text-mediumGray absolute z-50 flex w-full flex-row items-center justify-center gap-2 bg-black/50 px-6 py-6 backdrop-blur-[30px] backdrop-saturate-[120%] lg:h-52 lg:text-3xl xl:h-30 2xl:h-32 2xl:text-2xl">
-      <div className="flex flex-1 items-center justify-start">
-        <img src={img} alt="Logo" className="h-full w-xl lg:w-52 2xl:w-52" />
+    <div className="font-tech-mono text-mediumGray text-md absolute z-50 flex h-[5rem] w-full flex-row items-center justify-center gap-2 bg-black/50 backdrop-blur-[30px] backdrop-saturate-[120vh] sm:h-[6rem] sm:text-lg md:h-[6em] md:text-2xl lg:h-[14rem] lg:text-4xl xl:h-[16rem] xl:text-5xl 2xl:h-[16rem]">
+      <div className="flex h-full flex-1 items-center justify-start">
+        <img
+          src={img}
+          alt="Logo"
+          className="h-full w-full sm:w-[14rem] md:w-[20rem] lg:w-[24rem] xl:w-[28rem] 2xl:w-[30rem]"
+        />
       </div>
       <div className="flex flex-3 flex-col items-center justify-center">
         <p>Author: {models[currentModelIndex]?.author || "Unknown"}</p>

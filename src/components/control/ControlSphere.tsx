@@ -6,10 +6,10 @@ export const ControlSphere = () => {
       <sphereGeometry args={[2, 64, 64]} />
       <meshBasicMaterial toneMapped={false}>
         <GradientTexture
-          stops={[0.2, 0.6, 0.9]}
-          colors={["#ff00ff", "#66ffcc", "#00ffff"]}
+          stops={[0.2, 0.5, 0.8]}
+          colors={["#EBEDF2", "#00FFFF", "#AACCAA"]}
           size={1024}
-          type={GradientType.Radial}
+          type={GradientType.Linear}
         />
       </meshBasicMaterial>
     </mesh>

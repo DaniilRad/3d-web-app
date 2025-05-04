@@ -37,7 +37,7 @@ const SidebarAndModal = ({
 
   // Camera control settings
   const [settings, setSettings] = useState({
-    lightIntensity: 4,
+    lightIntensity: 2,
     autoSwitch: true,
     lightColor: "#ffffff",
     currentModelIndex: 0,
@@ -193,8 +193,8 @@ const SidebarAndModal = ({
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
 
             {/* Theta Controls */}
-            <div className="w-full text-center">
-              <p className="mb-4 text-sm text-gray-300">
+            <div className="flex w-full flex-col gap-2 text-center">
+              <p className="text-sm text-gray-300">
                 THETA: Rotate - horizontal axis.
               </p>
               <div className="flex flex-wrap justify-between gap-2">
@@ -220,8 +220,8 @@ const SidebarAndModal = ({
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
 
             {/* Phi Controls */}
-            <div className="w-full text-center">
-              <p className="mb-4 text-sm text-gray-300">
+            <div className="flex w-full flex-col gap-2 text-center">
+              <p className="text-sm text-gray-300">
                 PHI: Rotate - vertical axis.
               </p>
               <div className="flex flex-wrap justify-between gap-2">
@@ -247,8 +247,8 @@ const SidebarAndModal = ({
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
 
             {/* Truck Controls */}
-            <div className="w-full text-center">
-              <p className="mb-4 text-sm text-gray-300">
+            <div className="flex w-full flex-col gap-2 text-center">
+              <p className="text-sm text-gray-300">
                 TRUCK: Move - horizontal and vertical axis.
               </p>
               <div className="flex flex-wrap justify-between gap-2">
@@ -348,8 +348,11 @@ const SidebarAndModal = ({
           </div>
           {/* Color picker */}
           <div className="flex flex-row gap-4">
-            <label className="flex flex-col items-center justify-center gap-2 text-white">
-              Light Color: {settings.lightColor}
+            <label className="flex flex-row items-center justify-center gap-2 text-white">
+              <p>Light Color: </p>
+              <p style={{ color: `${settings.lightColor}` }}>
+                {settings.lightColor}
+              </p>
             </label>
             <ColorPicker
               value={settings.lightColor}

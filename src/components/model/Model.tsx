@@ -2,7 +2,12 @@ import { Ground } from "@/components/regular/Ground";
 import { Center, Preload } from "@react-three/drei";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
-import { GLTFLoader, STLLoader, OBJLoader, FBXLoader } from "three/examples/jsm/Addons.js";
+import {
+  GLTFLoader,
+  STLLoader,
+  OBJLoader,
+  FBXLoader,
+} from "three/examples/jsm/Addons.js";
 
 export interface ModelProps {
   url: string;
@@ -11,13 +16,15 @@ export interface ModelProps {
 }
 
 export const Model: React.FC<ModelProps> = ({
-  url, targetSize = 3.5, groundLevel = 0,
+  url,
+  targetSize = 3.5,
+  groundLevel = 0,
 }) => {
   const [model, setModel] = useState<
     THREE.Object3D | THREE.BufferGeometry | null
   >(null);
   const [material] = useState(
-    () => new THREE.MeshStandardMaterial({ color: "#fef" })
+    () => new THREE.MeshStandardMaterial({ color: "#fef" }),
   );
   const groupRef = useRef<THREE.Group>(null);
 
@@ -82,13 +89,13 @@ export const Model: React.FC<ModelProps> = ({
 
       return model;
     },
-    [groundLevel]
+    [groundLevel],
   );
 
   const processGeometry = useCallback(
     (geometry: THREE.BufferGeometry, size: number) => {
       const box = new THREE.Box3().setFromBufferAttribute(
-        geometry.attributes.position as THREE.BufferAttribute
+        geometry.attributes.position as THREE.BufferAttribute,
       );
       const center = new THREE.Vector3();
       const boxSize = new THREE.Vector3();
@@ -107,7 +114,7 @@ export const Model: React.FC<ModelProps> = ({
         position.setX(i, position.getX(i) * scale);
         position.setY(
           i,
-          position.getY(i) * scale + (groundLevel - lowestPoint)
+          position.getY(i) * scale + (groundLevel - lowestPoint),
         );
         position.setZ(i, position.getZ(i) * scale);
       }
@@ -115,7 +122,7 @@ export const Model: React.FC<ModelProps> = ({
 
       return scaledGeometry;
     },
-    [groundLevel]
+    [groundLevel],
   );
 
   if (!model) return null;
@@ -131,7 +138,8 @@ export const Model: React.FC<ModelProps> = ({
               geometry={model}
               material={material}
               castShadow
-              receiveShadow />
+              receiveShadow
+            />
           ) : (
             <primitive object={model} />
           )}

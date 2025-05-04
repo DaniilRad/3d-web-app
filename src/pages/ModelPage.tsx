@@ -139,6 +139,7 @@ export default function ModelPage() {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
+      <div className="absolute top-[50%] -right-0 z-50 h-20 w-20 bg-amber-300 sm:bg-amber-600 md:bg-amber-900 lg:bg-blue-300 xl:bg-blue-600 2xl:bg-blue-900" />
       <Header
         models={models}
         currentModelIndex={currentModelIndex}

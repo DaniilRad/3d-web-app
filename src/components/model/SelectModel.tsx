@@ -16,7 +16,7 @@ export const SelectModel = ({
   setCurrentModelIndex: (index: number) => void;
 }) => {
   return (
-    <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
+    <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-4 py-6">
       <Select
         onValueChange={(value) => {
           setCurrentModelIndex(
