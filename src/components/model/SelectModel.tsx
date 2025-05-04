@@ -9,16 +9,20 @@ import {
 } from "../ui/select";
 
 export const SelectModel = ({
-  models,
+  modelsList,
   setCurrentModelIndex,
 }: {
-  models: string[];
+  modelsList: { id: string; author: string; url: string }[];
   setCurrentModelIndex: (index: number) => void;
 }) => {
   return (
     <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-4 py-6 backdrop-blur-[15px] backdrop-saturate-[100%]">
       <Select
-        onValueChange={(value) => setCurrentModelIndex(models.indexOf(value))}
+        onValueChange={(value) => {
+          setCurrentModelIndex(
+            modelsList.findIndex((model) => model.id === value),
+          );
+        }}
       >
         <SelectTrigger>
           <SelectValue placeholder="Select a model" />
@@ -26,9 +30,9 @@ export const SelectModel = ({
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Models</SelectLabel>
-            {models.map((_model, index) => (
-              <SelectItem value={_model} key={index}>
-                Model {index + 1}
+            {modelsList.map((_model, index) => (
+              <SelectItem value={_model.id} key={index}>
+                {_model.id}
               </SelectItem>
             ))}
           </SelectGroup>

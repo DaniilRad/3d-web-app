@@ -76,6 +76,6 @@ const ORIGINAL_CAMERA_POSITION = new THREE.Vector3(15, 15, 0); // Store original
 export const ORIGINAL_DISTANCE = ORIGINAL_CAMERA_POSITION.length(); // Calculate original distance from [0,0,0]
 
 export const TORUS_COMBINATIONS = {
-  color1: ["#FF00FF", "#66FFCC", "#00FFFF"],
-  color2: ["#FF2B34", "#82D5B8", "#EED7CB"],
+  color1: ["#EBEDF2", "#00FFFF", "#AACCAA"],
+  color2: ["#FF2B34", "#00FFFF", "#AACCAA"],
 };

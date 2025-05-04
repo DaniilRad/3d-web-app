@@ -1,17 +1,24 @@
-import { io } from "socket.io-client";
 import { useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 
-import SidebarAndUpload from "@/components/control/SidebarAndUpload";
-import { Scene } from "@/components/control/Scene";
+// import { io } from "socket.io-client";
+import { socket } from "@/main";
 
-export const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
-  autoConnect: true,
-  reconnection: true,
-});
+import { Scene } from "@/components/control/Scene";
+import SidebarAndUpload from "@/components/control/SidebarAndUpload";
+import { ControlsModal } from "@/components/model/ControlsModal";
+
+import img from "@/assets/logo.svg";
+
+// export const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
+//   autoConnect: true,
+//   reconnection: true,
+// });
 
 export default function ControllerPage() {
   const [hasControl, setHasControl] = useState(false);
+  const [showModal, setShowModal] = useState(true);
+
   const hasRequestedControl = useRef(false);
 
   const cameraControlsRef = useRef<any>(null);
@@ -36,11 +43,15 @@ export default function ControllerPage() {
 
   return (
     <div className="bg-deepBlack relative flex h-screen">
+      {showModal && <ControlsModal setShowModal={setShowModal} />}
       <SidebarAndUpload
         hasControl={hasControl}
         cameraControlsRef={cameraControlsRef}
         onResetCamera={resetCamera}
       />
+      <div className="absolute top-0 right-0 z-10 w-[20%] p-6">
+        <img src={img} alt="logo" className="sm:w-[80%] xl:w-full" />
+      </div>
 
       <Canvas shadows camera={{ position: [15, 15, 0], fov: 60 }}>
         <Scene hasControl={hasControl} cameraControlsRef={cameraControlsRef} />

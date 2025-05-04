@@ -5,7 +5,7 @@ import { useRef, useState, useEffect } from "react";
 import { Ground } from "../regular/Ground";
 import { Shadows } from "../regular/Shadows";
 import { ControlSphere } from "./ControlSphere";
-import { socket } from "@/pages/ControlPage";
+import { socket } from "@/main";
 import { useFrame } from "@react-three/fiber";
 
 export const Scene = ({
@@ -25,7 +25,6 @@ export const Scene = ({
   useEffect(() => {
     socket.on("settings_update_local", (data) => {
       setSettings(data);
-      console.log("Settings local updated:", data);
     });
     return () => {
       socket.off("settings_update_local");

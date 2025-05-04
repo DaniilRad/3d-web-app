@@ -1,78 +1,142 @@
-import { useLoader } from "@react-three/fiber";
-import React, { useState, useEffect } from "react";
+import { Ground } from "@/components/regular/Ground";
+import { Center, Preload } from "@react-three/drei";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, STLLoader, OBJLoader, FBXLoader } from "three/examples/jsm/Addons.js";
 
 export interface ModelProps {
   url: string;
-  preload?: boolean;
+  targetSize?: number;
+  groundLevel?: number;
 }
 
-export const Model: React.FC<ModelProps> = ({ url, preload = false }) => {
-  const gltf = useLoader(GLTFLoader, url);
-  const [scaledScene, setScaledScene] = useState<THREE.Object3D | null>(null);
-  const TARGET_SIZE = 0.5; // The size of the reference bounding box (cube)
+export const Model: React.FC<ModelProps> = ({
+  url, targetSize = 3.5, groundLevel = 0,
+}) => {
+  const [model, setModel] = useState<
+    THREE.Object3D | THREE.BufferGeometry | null
+  >(null);
+  const [material] = useState(
+    () => new THREE.MeshStandardMaterial({ color: "#fef" })
+  );
+  const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
-    if (!preload && gltf.scene) {
-      const clonedScene = gltf.scene.clone();
+    let loader: any;
+    let active = true;
+    console.log("Loading model from URL:", url);
+    const loadModel = async () => {
+      try {
+        if (url.endsWith(".gltf") || url.endsWith(".glb")) {
+          loader = new GLTFLoader();
+          const gltf = await loader.loadAsync(url);
+          if (!active) return;
+          const processedModel = processModel(gltf.scene, targetSize);
+          setModel(processedModel);
+        } else if (url.endsWith(".stl")) {
+          loader = new STLLoader();
+          const geometry = await loader.loadAsync(url);
+          if (!active) return;
+          const processedGeometry = processGeometry(geometry, targetSize);
+          setModel(processedGeometry);
+        } else if (url.endsWith(".obj")) {
+          loader = new OBJLoader();
+          const object = await loader.loadAsync(url);
+          if (active) setModel(object);
+        } else if (url.endsWith(".fbx")) {
+          loader = new FBXLoader();
+          const fbx = await loader.loadAsync(url);
+          if (active) setModel(fbx);
+        }
+        console.log("Loader used:", loader.constructor.name);
+      } catch (error) {
+        console.error("Error loading model:", error);
+      }
+    };
 
-      // ✅ Step 1: Reset scale to (1,1,1) to normalize models with different scales
-      clonedScene.scale.set(0.1, 0.1, 0.1);
-      clonedScene.updateMatrixWorld(true);
+    loadModel();
 
-      // Compute bounding box of the model
-      const newBounds = new THREE.Box3().setFromObject(clonedScene);
-      const size = new THREE.Vector3();
-      newBounds.getSize(size);
+    return () => {
+      active = false;
+    };
+  }, [url]);
+
+  const processModel = useCallback(
+    (model: THREE.Object3D, size: number) => {
+      const box = new THREE.Box3().setFromObject(model);
       const center = new THREE.Vector3();
-      newBounds.getCenter(center);
+      const boxSize = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(boxSize);
 
-      if (size.x === 0 || size.y === 0 || size.z === 0) return; // Prevent invalid bounding boxes
+      const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
+      const scale = size / maxDim;
 
-      // ✅ Step 2: Create a reference cube (pattern for scaling)
-      const mainBounds = new THREE.Box3(
-        new THREE.Vector3(-TARGET_SIZE / 2, -TARGET_SIZE / 2, -TARGET_SIZE / 2),
-        new THREE.Vector3(TARGET_SIZE / 2, TARGET_SIZE / 2, TARGET_SIZE / 2),
+      // Calculate the lowest point of the model
+      const lowestPoint = box.min.y * scale;
+      const modelX = model.position.x;
+      const modelZ = model.position.z;
+      // Position model so its bottom sits exactly at groundLevel
+      model.position.set(modelX, groundLevel - lowestPoint, modelZ);
+      model.scale.set(scale, scale, scale);
+
+      return model;
+    },
+    [groundLevel]
+  );
+
+  const processGeometry = useCallback(
+    (geometry: THREE.BufferGeometry, size: number) => {
+      const box = new THREE.Box3().setFromBufferAttribute(
+        geometry.attributes.position as THREE.BufferAttribute
       );
+      const center = new THREE.Vector3();
+      const boxSize = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(boxSize);
 
-      // ✅ Step 3: Compute scale ratio based on the reference cube
-      const lengthSceneBounds = {
-        x: Math.abs(mainBounds.max.x - mainBounds.min.x),
-        y: Math.abs(mainBounds.max.y - mainBounds.min.y),
-        z: Math.abs(mainBounds.max.z - mainBounds.min.z),
-      };
+      const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
+      const scale = size / maxDim;
+      const lowestPoint = box.min.y * scale;
 
-      const lengthMeshBounds = {
-        x: Math.abs(newBounds.max.x - newBounds.min.x),
-        y: Math.abs(newBounds.max.y - newBounds.min.y),
-        z: Math.abs(newBounds.max.z - newBounds.min.z),
-      };
+      // Clone geometry and apply scaling/positioning
+      const scaledGeometry = geometry.clone();
+      const position = scaledGeometry.attributes.position;
 
-      const lengthRatios = [
-        lengthSceneBounds.x / lengthMeshBounds.x,
-        lengthSceneBounds.y / lengthMeshBounds.y,
-        lengthSceneBounds.z / lengthMeshBounds.z,
-      ];
+      for (let i = 0; i < position.count; i++) {
+        position.setX(i, position.getX(i) * scale);
+        position.setY(
+          i,
+          position.getY(i) * scale + (groundLevel - lowestPoint)
+        );
+        position.setZ(i, position.getZ(i) * scale);
+      }
+      position.needsUpdate = true;
 
-      // ✅ Step 4: Apply the smallest ratio to scale the model proportionally
-      let minRatio = Math.min(...lengthRatios);
-      let padding = 0.1; // Optional padding
-      minRatio -= padding;
+      return scaledGeometry;
+    },
+    [groundLevel]
+  );
 
-      clonedScene.scale.setScalar(minRatio);
+  if (!model) return null;
 
-      // ✅ Step 5: Recalculate bounding box and recenter model
-      clonedScene.updateMatrixWorld(true);
-      const newBox = new THREE.Box3().setFromObject(clonedScene);
-      const newCenter = new THREE.Vector3();
-      newBox.getCenter(newCenter);
-      clonedScene.position.sub(newCenter);
-
-      setScaledScene(clonedScene);
-    }
-  }, [gltf, preload]);
-
-  if (!scaledScene) return null;
-  return <primitive object={scaledScene} />;
+  return (
+    <group position-y={-0.5}>
+      <Center>
+        <Ground />
+        <Preload />
+        <group ref={groupRef}>
+          {model instanceof THREE.BufferGeometry ? (
+            <mesh
+              geometry={model}
+              material={material}
+              castShadow
+              receiveShadow />
+          ) : (
+            <primitive object={model} />
+          )}
+        </group>
+      </Center>
+    </group>
+  );
 };

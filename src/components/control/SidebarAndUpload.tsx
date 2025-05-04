@@ -12,7 +12,7 @@ import {
   DEGREES_PHI,
   DEGREES_THETA,
 } from "../utils/Constants";
-import { socket } from "@/pages/ControlPage";
+import { socket } from "@/main";
 import { Slider } from "../ui/slider";
 import { ColorPicker } from "../ui/color-picker";
 import { SelectModel } from "../model/SelectModel";
@@ -31,7 +31,9 @@ const SidebarAndModal = ({
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
-  const [models, setModels] = useState<string[]>([]);
+  const [models, setModels] = useState<
+    { id: string; author: string; url: string }[]
+  >([]);
 
   // Camera control settings
   const [settings, setSettings] = useState({
@@ -60,8 +62,8 @@ const SidebarAndModal = ({
   };
 
   const handleMetadata = (selectedFile: File | null, author: string) => {
-    setSelectedFile(selectedFile); // Set the selected file
-    setAuthor(author); // Set the author
+    setSelectedFile(selectedFile);
+    setAuthor(author);
   };
 
   const handleFileRemove = () => {
@@ -71,8 +73,7 @@ const SidebarAndModal = ({
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploadStatus("📤 Uploading...");
-    console.log("Author: ", author);
-    // Emit request for a presigned URL to upload the file
+
     socket.emit("request_presigned_url", {
       fileName: selectedFile.name,
       fileType: selectedFile.type,
@@ -82,15 +83,13 @@ const SidebarAndModal = ({
       try {
         const response = await fetch(uploadUrl, {
           method: "PUT",
-          body: selectedFile, // Upload the selected file
+          body: selectedFile,
           headers: { "Content-Type": selectedFile.type },
         });
 
         if (response.ok) {
           setUploadStatus("✅ Upload successful!");
-          console.log("Authir2: ", author);
-          // Emit upload complete, passing the fileName and author (from state)
-          socket.emit("upload_complete", { fileName, author: author });
+          socket.emit("upload_complete", { fileName, author });
         } else {
           throw new Error("Upload failed");
         }
@@ -105,23 +104,46 @@ const SidebarAndModal = ({
   };
 
   useEffect(() => {
-    // ✅ Initial fetch when the page loads
-    socket.emit("get_files");
-
-    socket.on("files_list", (fileList: { name: string; url: string }[]) => {
-      const modelUrls = fileList
-        .filter(
-          (file) =>
-            file.name.endsWith(".glb") ||
-            file.name.endsWith(".gltf") ||
-            file.name.endsWith(".stl"),
-        )
-        .map((file) => file.url);
-
-      if (modelUrls.length > 0) {
-        setModels(modelUrls);
+    socket.on("update_index", (currentIndex) => {
+      if (currentIndex) {
+        updateCurrentModelIndex(currentIndex);
       }
     });
+
+    return () => {
+      socket.off("update_index"); // Cleanup event listener on unmount
+    };
+  }, [settings]);
+
+  useEffect(() => {
+    socket.on("model_uploaded", () => {
+      updateSetting("autoSwitch", false);
+
+      socket.emit("get_files");
+
+      socket.once(
+        "files_list",
+        (modelsList: { id: string; author: string; url: string }[]) => {
+          if (modelsList.length > 0) {
+            setModels(modelsList);
+          }
+        },
+      );
+    });
+
+    return () => {
+      socket.off("model_uploaded");
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.emit("get_files");
+    socket.on(
+      "files_list",
+      (modelsList: { id: string; author: string; url: string }[]) => {
+        setModels(modelsList);
+      },
+    );
 
     return () => {
       socket.off("files_list");
@@ -137,7 +159,6 @@ const SidebarAndModal = ({
   useEffect(() => {
     if (hasControl) {
       socket.emit("settings_update_local", settingsCamera);
-      // console.log("Settings local send");
     }
   }, [settingsCamera, hasControl]);
 
@@ -154,7 +175,7 @@ const SidebarAndModal = ({
       )}
       {/* Settings Sidebar */}
       <div
-        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 p-6 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%] transition-all duration-300 ${
+        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 bg-black/50 p-6 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%] transition-all duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } w-full sm:w-100`}
       >
@@ -262,7 +283,6 @@ const SidebarAndModal = ({
                   checked={settings.autoSwitch}
                   onCheckedChange={(checked) => {
                     updateSetting("autoSwitch", checked);
-                    console.log("Auto Switch:", checked);
                   }}
                 />
                 <label
@@ -279,7 +299,6 @@ const SidebarAndModal = ({
                   checked={settingsCamera.autoRotate}
                   onCheckedChange={(checked) => {
                     updateSettingCamera("autoRotate", checked);
-                    console.log("Auto Rotate:", checked);
                   }}
                 />
                 <label
@@ -340,7 +359,7 @@ const SidebarAndModal = ({
             />
           </div>
           <SelectModel
-            models={models}
+            modelsList={models}
             setCurrentModelIndex={updateCurrentModelIndex}
           />
 
@@ -354,14 +373,18 @@ const SidebarAndModal = ({
           </Button>
 
           {/* Upload Model Button */}
-          {hasControl && (
-            <Button
-              onClick={() => setUploadModalOpen(true)}
-              className="hover:bg-lightGray mt-4 w-full text-white hover:text-black"
-              variant="outline"
-            >
-              Upload Model
-            </Button>
+          <Button
+            onClick={() => setUploadModalOpen(true)}
+            className="hover:bg-lightGray mt-4 w-full text-white hover:text-black"
+            variant="outline"
+            disabled={!hasControl}
+          >
+            Upload Model
+          </Button>
+          {!hasControl && (
+            <p className="mt-2 flex items-center justify-center text-sm">
+              You do not have control over the camera.
+            </p>
           )}
         </div>
       </div>
@@ -395,7 +418,7 @@ const SidebarAndModal = ({
               Upload
             </Button>
             {uploadStatus && (
-              <p className="mt-2 flex items-center justify-center text-sm">
+              <p className="text-lightGray mt-2 flex items-center justify-center text-sm">
                 {uploadStatus}
               </p>
             )}

@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FileUploadProps {
   onFileSelect: (file: File, author: string) => void;
@@ -15,6 +15,16 @@ export default function FileUpload({
   const [error, setError] = useState<string | null>(null);
   const MAX_SIZE_MB = 25;
 
+  useEffect(() => {
+    if (file) {
+      if (author) {
+        onFileSelect(file, author);
+      } else {
+        onFileSelect(file, "Anonymous");
+      }
+    }
+  }, [file, author])
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
 
@@ -27,14 +37,15 @@ export default function FileUpload({
       } else if (
         !selectedFile.name.endsWith(".glb") &&
         !selectedFile.name.endsWith(".gltf") &&
-        !selectedFile.name.endsWith(".stl")
+        !selectedFile.name.endsWith(".stl") &&
+        !selectedFile.name.endsWith(".obj") &&
+        !selectedFile.name.endsWith(".fbx")
       ) {
         setError("❌ Invalid file type! Only .glb/.gltf/.stl allowed.");
         setFile(null);
       } else {
         setError(null);
         setFile(selectedFile);
-        onFileSelect(selectedFile, author || "Anonymous"); // Pass author as "Anonymous" if empty
       }
     }
   };
@@ -65,7 +76,7 @@ export default function FileUpload({
 
       <input
         type="file"
-        accept=".glb,.gltf,.stl"
+        accept=".glb,.gltf,.stl,.obj,.fbx"
         onChange={handleFileChange}
         className="hidden"
         id="fileInput"
@@ -83,7 +94,9 @@ export default function FileUpload({
         type="text"
         placeholder="Enter Author Name (optional)"
         value={author}
-        onChange={(e) => setAuthor(e.target.value)}
+        onChange={(e) => {
+          setAuthor(e.target.value);
+        }}
         className="text-lightGray mt-2 w-full rounded-md border p-2 text-sm"
       />
 
