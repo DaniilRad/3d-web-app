@@ -45,7 +45,7 @@ export default function ControllerPage() {
     <div className="bg-deepBlack relative flex h-screen">
       <div className="absolute top-[50%] -right-0 z-50 h-20 w-20 bg-amber-300 sm:bg-amber-600 md:bg-amber-900 lg:bg-blue-300 xl:bg-blue-600 2xl:bg-blue-900" />
 
-      {/* {showModal && <ControlsModal setShowModal={setShowModal} />} */}
+      {showModal && <ControlsModal setShowModal={setShowModal} />}
       <SidebarAndUpload
         hasControl={hasControl}
         cameraControlsRef={cameraControlsRef}
