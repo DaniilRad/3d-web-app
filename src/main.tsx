@@ -7,8 +7,8 @@ import ModelPage from "./pages/ModelPage";
 import ControlPage from "./pages/ControlPage";
 import { io } from "socket.io-client";
 
-// export const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
-export const socket = io("http://localhost:8080", {
+export const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
+  // export const socket = io("http://localhost:8080", {
   autoConnect: true,
   reconnection: true,
 });

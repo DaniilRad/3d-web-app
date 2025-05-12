@@ -44,7 +44,7 @@ export default function ControllerPage() {
 
   return (
     <div className="h-full w-full">
-      {/* {showModal && <ControlsModal setShowModal={setShowModal} />} */}
+      {showModal && <ControlsModal setShowModal={setShowModal} />}
       <SidebarAndUpload
         hasControl={hasControl}
         cameraControlsRef={cameraControlsRef}

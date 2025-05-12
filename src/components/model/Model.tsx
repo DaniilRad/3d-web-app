@@ -1,4 +1,3 @@
-import { Ground } from "@/components/regular/Ground";
 import { Center, Preload } from "@react-three/drei";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
