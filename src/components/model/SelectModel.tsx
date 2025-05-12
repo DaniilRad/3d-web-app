@@ -12,11 +12,11 @@ export const SelectModel = ({
   modelsList,
   setCurrentModelIndex,
 }: {
-  modelsList: { id: string; author: string; url: string }[];
+  modelsList: { id: string; author: string; url: string; folder: string }[];
   setCurrentModelIndex: (index: number) => void;
 }) => {
   return (
-    <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-4 py-6">
+    <div className="text-lightGray font-tech-mono flex w-full items-center justify-center gap-4 px-2 py-3">
       <Select
         onValueChange={(value) => {
           setCurrentModelIndex(

@@ -9,6 +9,7 @@ import SidebarAndUpload from "@/components/control/SidebarAndUpload";
 import { ControlsModal } from "@/components/model/ControlsModal";
 
 import img from "@/assets/logo.svg";
+import { MonitorCheck, MonitorOff } from "lucide-react";
 
 // export const socket = io("https://websocket-server-ucimr.ondigitalocean.app", {
 //   autoConnect: true,
@@ -42,22 +43,30 @@ export default function ControllerPage() {
   }, []);
 
   return (
-    <div className="bg-deepBlack relative flex h-screen">
-      {/* <div className="absolute top-[50%] -right-0 z-50 h-20 w-20 bg-amber-300 sm:bg-amber-600 md:bg-amber-900 lg:bg-blue-300 xl:bg-blue-600 2xl:bg-blue-900" /> */}
-
-      {showModal && <ControlsModal setShowModal={setShowModal} />}
+    <div className="h-full w-full">
+      {/* {showModal && <ControlsModal setShowModal={setShowModal} />} */}
       <SidebarAndUpload
         hasControl={hasControl}
         cameraControlsRef={cameraControlsRef}
         onResetCamera={resetCamera}
       />
-      <div className="absolute top-0 right-0 z-10 p-6">
+      <div className="absolute top-0 right-0 z-10 flex flex-row items-center justify-center gap-4 p-6">
+        {hasControl ? (
+          <MonitorCheck size={28} className="text-lightGray" />
+        ) : (
+          <MonitorOff size={28} className="text-red-500" />
+        )}
         <img src={img} alt="logo" className="w-[6rem] sm:w-[8rem]" />
       </div>
 
-      <Canvas shadows camera={{ position: [15, 15, 0], fov: 60 }}>
-        <Scene hasControl={hasControl} cameraControlsRef={cameraControlsRef} />
-      </Canvas>
+      <div className="bg-deepBlack relative h-[90vh] touch-none overflow-hidden sm:h-[100vh]">
+        <Canvas shadows camera={{ position: [15, 15, 0], fov: 60 }}>
+          <Scene
+            hasControl={hasControl}
+            cameraControlsRef={cameraControlsRef}
+          />
+        </Canvas>
+      </div>
     </div>
   );
 }

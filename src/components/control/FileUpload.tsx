@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 interface FileUploadProps {
   onFileSelect: (file: File, author: string) => void;
   onFileRemove: () => void;
+  modelsName: string[];
 }
 
 export default function FileUpload({
   onFileSelect,
   onFileRemove,
+  modelsName,
 }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [author, setAuthor] = useState<string>(""); // Store the author name
@@ -23,7 +25,7 @@ export default function FileUpload({
         onFileSelect(file, "Anonymous");
       }
     }
-  }, [file, author])
+  }, [file, author]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -42,6 +44,12 @@ export default function FileUpload({
         !selectedFile.name.endsWith(".fbx")
       ) {
         setError("❌ Invalid file type! Only .glb/.gltf/.stl allowed.");
+        setFile(null);
+      } else if (modelsName.includes(selectedFile.name)) {
+        // Check if the file name already exists
+        setError(
+          `❌ File with name "${selectedFile.name}" already exists. Please choose another name.`,
+        );
         setFile(null);
       } else {
         setError(null);
@@ -68,9 +76,11 @@ export default function FileUpload({
             <X color="red" size={22} />
           </button>
         </div>
+      ) : error ? (
+        <p className="text-center text-sm text-red-500">{error}</p>
       ) : (
-        <p className="text-mediumGray text-sm">
-          Select a .glb/.gltf/.stl file (Max 25MB)
+        <p className="text-mediumGray text-center text-sm">
+          Select a .glb/.gltf/.stl/.obj/.fbx file (Max 25MB)
         </p>
       )}
 
@@ -99,8 +109,6 @@ export default function FileUpload({
         }}
         className="text-lightGray mt-2 w-full rounded-md border p-2 text-sm"
       />
-
-      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }

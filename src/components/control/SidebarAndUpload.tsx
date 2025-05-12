@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import FileUpload from "./FileUpload";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, MoveHorizontal, MoveVertical, Move } from "lucide-react";
 
 import { Checkbox } from "../ui/checkbox";
 
@@ -15,7 +15,7 @@ import {
 import { socket } from "@/main";
 import { Slider } from "../ui/slider";
 import { ColorPicker } from "../ui/color-picker";
-import { SelectModel } from "../model/SelectModel";
+import { SelectModels } from "./SeletModels";
 
 const SidebarAndModal = ({
   hasControl,
@@ -26,21 +26,28 @@ const SidebarAndModal = ({
   cameraControlsRef: React.RefObject<any>;
   onResetCamera: () => void;
 }) => {
+  const [adminOn, setAdminOn] = useState<boolean>(false);
+  const folders = ["user-models", "tuke-models"];
+  const [folderIndex, setFolderIndex] = useState<number>(0);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [author, setAuthor] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
-  const [models, setModels] = useState<
-    { id: string; author: string; url: string }[]
+  const [tukeModels, setTukeModels] = useState<
+    { id: string; author: string; url: string; folder: string }[]
+  >([]);
+  const [userModels, setUserModels] = useState<
+    { id: string; author: string; url: string; folder: string }[]
   >([]);
 
   // Camera control settings
   const [settings, setSettings] = useState({
-    lightIntensity: 2,
+    lightIntensity: 1,
     autoSwitch: true,
     lightColor: "#ffffff",
-    currentModelIndex: 0,
+    isUsers: true,
   });
 
   const [settingsCamera, setSettingsCamera] = useState({
@@ -48,10 +55,6 @@ const SidebarAndModal = ({
     rotateSpeed: 0.005,
     minDistance: 10,
   });
-
-  const updateCurrentModelIndex = (index: number) => {
-    updateSetting("currentModelIndex", index);
-  };
 
   const updateSetting = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -77,10 +80,12 @@ const SidebarAndModal = ({
     socket.emit("request_presigned_url", {
       fileName: selectedFile.name,
       fileType: selectedFile.type,
+      folder: folders[folderIndex],
     });
 
     socket.once("presigned_url", async ({ uploadUrl, fileName }) => {
       try {
+        const folder = folders[folderIndex];
         const response = await fetch(uploadUrl, {
           method: "PUT",
           body: selectedFile,
@@ -89,7 +94,7 @@ const SidebarAndModal = ({
 
         if (response.ok) {
           setUploadStatus("✅ Upload successful!");
-          socket.emit("upload_complete", { fileName, author });
+          socket.emit("upload_complete", { fileName, author, folder });
         } else {
           throw new Error("Upload failed");
         }
@@ -104,16 +109,10 @@ const SidebarAndModal = ({
   };
 
   useEffect(() => {
-    socket.on("update_index", (currentIndex) => {
-      if (currentIndex) {
-        updateCurrentModelIndex(currentIndex);
-      }
-    });
-
-    return () => {
-      socket.off("update_index"); // Cleanup event listener on unmount
-    };
-  }, [settings]);
+    {
+      !adminOn ? setFolderIndex(0) : setFolderIndex(1);
+    }
+  }, [adminOn]);
 
   useEffect(() => {
     socket.on("model_uploaded", () => {
@@ -121,14 +120,10 @@ const SidebarAndModal = ({
 
       socket.emit("get_files");
 
-      socket.once(
-        "files_list",
-        (modelsList: { id: string; author: string; url: string }[]) => {
-          if (modelsList.length > 0) {
-            setModels(modelsList);
-          }
-        },
-      );
+      socket.once("files_list", ({ tukeModels, userModels }) => {
+        setTukeModels(tukeModels);
+        setUserModels(userModels);
+      });
     });
 
     return () => {
@@ -138,12 +133,10 @@ const SidebarAndModal = ({
 
   useEffect(() => {
     socket.emit("get_files");
-    socket.on(
-      "files_list",
-      (modelsList: { id: string; author: string; url: string }[]) => {
-        setModels(modelsList);
-      },
-    );
+    socket.on("files_list", ({ tukeModels, userModels }) => {
+      setTukeModels(tukeModels);
+      setUserModels(userModels);
+    });
 
     return () => {
       socket.off("files_list");
@@ -167,26 +160,26 @@ const SidebarAndModal = ({
       {/* Sidebar Toggle Button */}
       {!sidebarOpen && (
         <button
-          className="bg-deepBlack/60 absolute top-4 left-4 z-40 rounded-md p-2 text-white backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%]"
+          className="bg-deepBlack/60 absolute top-0 left-0 z-40 m-6 rounded-md p-2 text-white backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%]"
           onClick={() => setSidebarOpen(true)}
         >
-          <Menu size={24} />
+          <Menu size={24} className="hover:text-neonBlue" />
         </button>
       )}
       {/* Settings Sidebar */}
       <div
-        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 bg-black/50 p-6 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%] transition-all duration-300 ${
+        className={`text-lightGray font-tech-mono fixed inset-0 z-50 flex h-full flex-col gap-4 bg-black/50 py-6 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%] transition-all duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } w-full sm:w-100`}
       >
-        <div className="flex justify-between">
+        <div className="flex justify-between px-[1em]">
           <h2 className="text-lg font-semibold">Camera Controls</h2>
           <button onClick={() => setSidebarOpen(false)}>
-            <X size={24} />
+            <X size={24} className="hover:text-neonBlue" />
           </button>
         </div>
 
-        <div className="flex w-full flex-col items-center justify-center space-y-2">
+        <div className="scrollbar-neon flex w-full flex-col items-center justify-start space-y-2 overflow-y-scroll">
           {/* Camera Control Buttons */}
           <div className="grid w-full grid-cols-1 gap-2">
             {/* Divider */}
@@ -194,10 +187,14 @@ const SidebarAndModal = ({
 
             {/* Theta Controls */}
             <div className="flex w-full flex-col gap-2 text-center">
-              <p className="text-sm text-gray-300">
-                THETA: Rotate - horizontal axis.
-              </p>
-              <div className="flex flex-wrap justify-between gap-2">
+              <div className="flex w-full items-center justify-center gap-2">
+                <MoveHorizontal size={16} color="#00FFFF" />
+                <p className="text-sm text-gray-300">
+                  THETA: <span className="text-neonBlue">Rotate</span> -
+                  horizontal axis.
+                </p>
+              </div>
+              <div className="flex justify-between">
                 {/* Replace DEGREES_THETA with your actual data */}
                 {DEGREES_THETA.map((degree) => (
                   <Button
@@ -221,10 +218,14 @@ const SidebarAndModal = ({
 
             {/* Phi Controls */}
             <div className="flex w-full flex-col gap-2 text-center">
-              <p className="text-sm text-gray-300">
-                PHI: Rotate - vertical axis.
-              </p>
-              <div className="flex flex-wrap justify-between gap-2">
+              <div className="flex w-full items-center justify-center gap-2">
+                <MoveVertical size={16} color="#00FFFF" />
+                <p className="text-sm text-gray-300">
+                  PHI: <span className="text-neonBlue">Rotate</span> - vertical
+                  axis.
+                </p>
+              </div>
+              <div className="flex justify-between">
                 {/* Replace DEGREES_PHI with your actual data */}
                 {DEGREES_PHI.map((degree) => (
                   <Button
@@ -248,9 +249,13 @@ const SidebarAndModal = ({
 
             {/* Truck Controls */}
             <div className="flex w-full flex-col gap-2 text-center">
-              <p className="text-sm text-gray-300">
-                TRUCK: Move - horizontal and vertical axis.
-              </p>
+              <div className="flex items-center justify-center gap-2">
+                <Move size={16} color="#00FFFF" />
+                <p className="text-sm text-gray-300">
+                  TRUCK: <span className="text-neonBlue">Move</span> -
+                  horizontal and vertical axis.
+                </p>
+              </div>
               <div className="flex flex-wrap justify-between gap-2">
                 {/* Replace AXIS_TRUCK with your actual data */}
                 {AXIS_TRUCK.map((side) => (
@@ -275,7 +280,7 @@ const SidebarAndModal = ({
           </div>
 
           {/* Camera Settings */}
-          <div className="mt-2 w-full space-y-4 text-center">
+          <div className="my-2 flex w-full flex-col gap-4 text-center">
             <div className="flex flex-row justify-around gap-2">
               <div className="flex flex-row-reverse items-center justify-end gap-4">
                 <Checkbox
@@ -321,23 +326,33 @@ const SidebarAndModal = ({
                 }
               />
             </label>
-            <label className="flex flex-col items-center justify-center gap-2 text-white">
-              Min Distance: {settingsCamera.minDistance.toFixed(1)}
-              <Slider
-                min={1}
-                max={20}
-                step={0.5}
-                value={[settingsCamera.minDistance]}
-                onValueChange={(value) =>
-                  updateSettingCamera("minDistance", value[0])
-                }
+            <SelectModels
+              tukeModels={tukeModels}
+              userModels={userModels}
+              hasControl={hasControl}
+              disabled={!selectedFile}
+              setAutoChange={updateSetting}
+            />
+            <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
+            <div className="flex flex-row items-center justify-center gap-4">
+              <label className="flex flex-row items-center justify-center gap-2 text-white">
+                <p>Light Color: </p>
+                <p style={{ color: `${settings.lightColor}` }}>
+                  {settings.lightColor}
+                </p>
+              </label>
+              <ColorPicker
+                value={settings.lightColor}
+                onChange={(v) => {
+                  updateSetting("lightColor", v);
+                }}
               />
-            </label>
+            </div>
             <label className="flex flex-col items-center justify-center gap-2 text-white">
               Light Intensity: {settings.lightIntensity.toFixed(1)}
               <Slider
-                min={0}
-                max={10}
+                min={0.5}
+                max={3.5}
                 step={0.1}
                 value={[settings.lightIntensity]}
                 onValueChange={(value) =>
@@ -345,27 +360,8 @@ const SidebarAndModal = ({
                 }
               />
             </label>
+            <div className="bg-mediumGray mt-2 mb-4 h-[1px] w-full md:block" />
           </div>
-          {/* Color picker */}
-          <div className="flex flex-row gap-4">
-            <label className="flex flex-row items-center justify-center gap-2 text-white">
-              <p>Light Color: </p>
-              <p style={{ color: `${settings.lightColor}` }}>
-                {settings.lightColor}
-              </p>
-            </label>
-            <ColorPicker
-              value={settings.lightColor}
-              onChange={(v) => {
-                updateSetting("lightColor", v);
-              }}
-            />
-          </div>
-          <SelectModel
-            modelsList={models}
-            setCurrentModelIndex={updateCurrentModelIndex}
-          />
-
           {/* Reset Camera Button */}
           <Button
             onClick={onResetCamera}
@@ -389,6 +385,14 @@ const SidebarAndModal = ({
               You do not have control over the camera.
             </p>
           )}
+          <Checkbox
+            hidden
+            id="adminOn"
+            checked={!adminOn}
+            onCheckedChange={() => {
+              setAdminOn(!adminOn);
+            }}
+          />
         </div>
       </div>
 
@@ -410,6 +414,11 @@ const SidebarAndModal = ({
             <FileUpload
               onFileSelect={handleMetadata}
               onFileRemove={handleFileRemove}
+              modelsName={
+                !adminOn
+                  ? tukeModels.map((model) => model.id)
+                  : userModels.map((model) => model.id)
+              }
             />
 
             <Button

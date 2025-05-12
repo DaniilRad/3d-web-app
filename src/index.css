@@ -6,9 +6,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-neonBlue: oklch(75.33% 0.1346 219.54);
-  --color-neonPurple: oklch(68.92% 0.1909 313.35);
-  --color-neonRed: oklch(66.23% 0.2027 21.38);
+  --color-lightBlue: oklch(0.95 0.007 268.55);
+  --color-neonBlue: oklch(0.91 0.15455 194.7689);
+  --color-safariGreen: oklch(0.81 0.0596 145);
   --color-deepBlack: oklch(15.91% 0 0);
   --color-lightGray: oklch(94.6% 0.007 268.55);
   --color-mediumGray: oklch(86.98% 0.0072 268.54);
@@ -129,4 +129,25 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-neon {
+  width: 100%;
+  padding-left: 1em;
+  padding-right: 1em;
+  overflow-y: auto;
+  padding-right: 1em;
+}
+
+/* For WebKit browsers (Chrome, Safari, Edge) */
+.scrollbar-neon::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+  background-color: #000 transparent;
+}
+
+.scrollbar-neon::-webkit-scrollbar-thumb {
+  background: #00ffff;
+  width: 6px;
 }

@@ -18,20 +18,68 @@ export interface ModelProps {
 export const Model: React.FC<ModelProps> = ({
   url,
   targetSize = 3.5,
+
   groundLevel = 0,
 }) => {
   const [model, setModel] = useState<
     THREE.Object3D | THREE.BufferGeometry | null
   >(null);
+  const [groundMaterial, setGroundMaterial] =
+    useState<THREE.MeshStandardMaterial | null>(null);
+
   const [material] = useState(
     () => new THREE.MeshStandardMaterial({ color: "#fef" }),
   );
   const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    const texturePath = "/src/assets/Grass005_1K-JPG/";
+
+    // Load all PBR textures
+    Promise.all([
+      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Color.jpg`),
+      loader.loadAsync(`${texturePath}Grass005_1K-JPG_NormalGL.jpg`),
+      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Roughness.jpg`),
+      loader.loadAsync(`${texturePath}Grass005_1K-JPG_AmbientOcclusion.jpg`),
+      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Displacement.jpg`),
+    ])
+      .then(([colorMap, normalMap, roughnessMap, aoMap, displacementMap]) => {
+        // Configure all textures
+        [colorMap, normalMap, roughnessMap, aoMap, displacementMap].forEach(
+          (map) => {
+            map.wrapS = map.wrapT = THREE.RepeatWrapping;
+            map.repeat.set(100, 100);
+            map.anisotropy = 16; // Improves texture quality at oblique angles
+          },
+        );
+
+        // Create material with all maps
+        const material = new THREE.MeshStandardMaterial({
+          map: colorMap, // Base color
+          normalMap: normalMap, // Surface details
+          normalScale: new THREE.Vector2(1, 1), // Adjust normal intensity
+          roughnessMap: roughnessMap, // Surface smoothness
+          roughness: 2, // Default roughness
+          aoMap: aoMap, // Ambient occlusion
+          aoMapIntensity: 1, // AO strength
+          displacementMap: displacementMap, // Height displacement
+          displacementScale: 0.2, // Increased for more visible grass variation
+          displacementBias: -0.1,
+          metalness: 0, // Non-metallic surface
+          side: THREE.DoubleSide, // Render both sides
+        });
+
+        setGroundMaterial(material);
+      })
+      .catch((error) => {
+        console.error("Error loading PBR textures:", error);
+      });
+  }, []);
+
+  useEffect(() => {
     let loader: any;
     let active = true;
-    console.log("Loading model from URL:", url);
     const loadModel = async () => {
       try {
         if (url.endsWith(".gltf") || url.endsWith(".glb")) {
@@ -55,7 +103,6 @@ export const Model: React.FC<ModelProps> = ({
           const fbx = await loader.loadAsync(url);
           if (active) setModel(fbx);
         }
-        console.log("Loader used:", loader.constructor.name);
       } catch (error) {
         console.error("Error loading model:", error);
       }
@@ -130,7 +177,18 @@ export const Model: React.FC<ModelProps> = ({
   return (
     <group position-y={-0.5}>
       <Center>
-        <Ground />
+        {/* <Ground /> */}
+        {groundMaterial && (
+          <mesh
+            position={[0, groundLevel, 0]}
+            rotation={[-Math.PI / 2, groundLevel, 0]}
+            receiveShadow
+            castShadow
+          >
+            <planeGeometry args={[500, 500, 128, 128]} />
+            <primitive object={groundMaterial} attach="material" />
+          </mesh>
+        )}
         <Preload />
         <group ref={groupRef}>
           {model instanceof THREE.BufferGeometry ? (

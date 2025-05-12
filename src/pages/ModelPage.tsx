@@ -16,14 +16,34 @@ import { Header } from "@/components/model/Header";
 
 export default function ModelPage() {
   const cameraRef = useRef<any>(null);
-  const [models, setModels] = useState<
-    { id: string; author: string; url: string }[]
+
+  const [tukeModels, setTukeModels] = useState<
+    { id: string; author: string; url: string; folder: string }[]
   >([]);
+  const [userModels, setUserModels] = useState<
+    { id: string; author: string; url: string; folder: string }[]
+  >([]);
+  const [activeModelSource, setActiveModelSource] =
+    useState<string>("userModels");
+
+  const [currentModelList, setCurrentModelList] = useState<
+    { id: string; author: string; url: string; folder: string }[]
+  >([]);
+
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [autoSwitch, setAutoSwitch] = useState(true);
   const switchInterval = 5000;
   const [countdown, setCountdown] = useState(switchInterval / 1000);
+
+  useEffect(() => {
+    let modelList =
+      activeModelSource === "tuke-models" ? tukeModels : userModels;
+    if (currentModelIndex >= modelList.length) {
+      setCurrentModelIndex(0);
+    }
+    setCurrentModelList(modelList);
+  }, [activeModelSource, currentModelIndex, tukeModels, userModels]);
 
   useEffect(() => {
     if (cameraRef.current) {
@@ -38,22 +58,18 @@ export default function ModelPage() {
       setAutoSwitch(false);
 
       socket.emit("get_files");
-      socket.once(
-        "files_list",
-        (modelsList: { id: string; author: string; url: string }[]) => {
-          if (modelsList.length > 0) {
-            setModels(modelsList);
-            setLoading(false);
+      socket.once("files_list", ({ tukeModels, userModels }) => {
+        setTukeModels(tukeModels);
+        setUserModels(userModels);
+        setLoading(false);
 
-            const newIndex = modelsList.findIndex((model) => {
-              return model.url === file.modelUrl;
-            });
-            if (newIndex !== -1) {
-              setCurrentModelIndex(newIndex);
-            }
-          }
-        },
-      );
+        const newIndex = currentModelList.findIndex((model) => {
+          return model.url === file.modelUrl;
+        });
+        if (newIndex !== -1) {
+          setCurrentModelIndex(newIndex);
+        }
+      });
     });
 
     return () => {
@@ -63,15 +79,13 @@ export default function ModelPage() {
 
   useEffect(() => {
     socket.emit("get_files");
-    socket.on(
-      "files_list",
-      (modelsList: { id: string; author: string; url: string }[]) => {
-        if (modelsList.length > 0) {
-          setModels(modelsList);
-          setLoading(false);
-        }
-      },
-    );
+    socket.on("files_list", ({ tukeModels, userModels }) => {
+      setTukeModels(tukeModels);
+      setUserModels(userModels);
+      let modelList = userModels;
+      setCurrentModelList(modelList);
+      setLoading(false);
+    });
 
     return () => {
       socket.off("files_list");
@@ -79,12 +93,12 @@ export default function ModelPage() {
   }, []);
 
   useEffect(() => {
-    if (models.length > 1 && autoSwitch) {
+    if (currentModelList.length > 1 && autoSwitch) {
       const interval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown <= 1) {
             setCurrentModelIndex((prevIndex) => {
-              const nextIndex = (prevIndex + 1) % models.length;
+              const nextIndex = (prevIndex + 1) % currentModelList.length;
               return nextIndex;
             });
             return switchInterval / 1000;
@@ -95,7 +109,7 @@ export default function ModelPage() {
 
       return () => clearInterval(interval);
     }
-  }, [models, autoSwitch]);
+  }, [currentModelList, autoSwitch]);
 
   useEffect(() => {
     socket.on("camera_update", (data) => {
@@ -122,7 +136,6 @@ export default function ModelPage() {
   useEffect(() => {
     socket.on("settings_update", (data) => {
       setAutoSwitch(data.autoSwitch);
-      setCurrentModelIndex(data.currentModelIndex);
     });
     return () => {
       socket.off("settings_update");
@@ -130,8 +143,25 @@ export default function ModelPage() {
   }, []);
 
   useEffect(() => {
-    socket.emit("model_switch", currentModelIndex);
+    socket.on("model_settings_update", (data) => {
+      setActiveModelSource(data.activeModelSource);
 
+      const modelList =
+        data.activeModelSource === "tuke-models" ? tukeModels : userModels;
+      if (data.currentModelIndex >= modelList.length) {
+        setCurrentModelIndex(0);
+      } else {
+        setCurrentModelIndex(data.currentModelIndex);
+      }
+    });
+
+    return () => {
+      socket.off("model_settings_update");
+    };
+  }, [tukeModels, userModels]);
+
+  useEffect(() => {
+    socket.emit("model_switch", currentModelIndex);
     return () => {
       socket.off("model_switch");
     };
@@ -141,7 +171,7 @@ export default function ModelPage() {
     <div className="relative flex h-screen flex-col overflow-hidden">
       {/* <div className="absolute top-[50%] -right-0 z-50 h-20 w-20 bg-amber-300 sm:bg-amber-600 md:bg-amber-900 lg:bg-blue-300 xl:bg-blue-600 2xl:bg-blue-900" /> */}
       <Header
-        models={models}
+        models={currentModelList}
         currentModelIndex={currentModelIndex}
         autoSwitch={autoSwitch}
         countdown={countdown}
@@ -151,8 +181,10 @@ export default function ModelPage() {
           <PerspectiveCamera ref={cameraRef} makeDefault />
           <Light isHelper={false} />
           <Suspense fallback={<TorusLoad colors={TORUS_COMBINATIONS.color1} />}>
-            {!loading && models.length > 0 ? (
-              <Model url={models[currentModelIndex].url} />
+            {!loading &&
+            currentModelList.length > 0 &&
+            currentModelList[currentModelIndex] ? (
+              <Model url={currentModelList[currentModelIndex].url} />
             ) : (
               <TorusLoad colors={TORUS_COMBINATIONS.color2} />
             )}
