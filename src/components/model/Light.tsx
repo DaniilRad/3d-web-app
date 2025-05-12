@@ -51,7 +51,7 @@ export const Light: React.FC<LightProps> = ({ isHelper }) => {
     <>
       {/* Base ambient fill light */}
       <ambientLight
-        intensity={lightSettings.intensity - lightSettings.ambientIntensity}
+        intensity={lightSettings.ambientIntensity}
         color={0xffffff}
       />
 
