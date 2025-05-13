@@ -414,11 +414,7 @@ const SidebarAndModal = ({
             <FileUpload
               onFileSelect={handleMetadata}
               onFileRemove={handleFileRemove}
-              modelsName={
-                !adminOn
-                  ? tukeModels.map((model) => model.id)
-                  : userModels.map((model) => model.id)
-              }
+              modelsName={userModels.map((model) => model.id)}
             />
 
             <Button

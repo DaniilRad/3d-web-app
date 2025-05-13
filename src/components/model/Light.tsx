@@ -59,8 +59,8 @@ export const Light: React.FC<LightProps> = ({ isHelper }) => {
       <hemisphereLight
         ref={hemisphereLightRef}
         color={0xffffbb} // Sky color
-        groundColor={0x080820} // Ground reflection
-        intensity={lightSettings.intensity - 0.4}
+        groundColor={0xffffbb} // Ground reflection
+        intensity={0.4}
       />
 
       {/* Main directional light (sun) */}
@@ -70,15 +70,6 @@ export const Light: React.FC<LightProps> = ({ isHelper }) => {
         intensity={lightSettings.intensity - 1}
         position={[5, 10, 7]}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={0.5}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-        shadow-bias={-0.0001}
       />
 
       {/* Soft backlight to reduce contrast */}
