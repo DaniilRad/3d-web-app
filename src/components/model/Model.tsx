@@ -12,13 +12,14 @@ export interface ModelProps {
   url: string;
   targetSize?: number;
   groundLevel?: number;
+  textureFolder: string;
 }
 
 export const Model: React.FC<ModelProps> = ({
   url,
   targetSize = 3.5,
-
   groundLevel = 0,
+  textureFolder = "grass",
 }) => {
   const [model, setModel] = useState<
     THREE.Object3D | THREE.BufferGeometry | null
@@ -31,50 +32,113 @@ export const Model: React.FC<ModelProps> = ({
   );
   const groupRef = useRef<THREE.Group>(null);
 
+  // useEffect(() => {
+  //   const loader = new THREE.TextureLoader();
+  //   const texturePath = `/src/assets/${groundFolder}/`;
+
+  //   // Load all PBR textures
+  //   Promise.all([
+  //     loader.loadAsync(`${texturePath}color.jpg`),
+  //     loader.loadAsync(`${texturePath}nrml.jpg`),
+  //     loader.loadAsync(`${texturePath}rough.jpg`),
+  //     loader.loadAsync(`${texturePath}ao.jpg`),
+  //     loader.loadAsync(`${texturePath}disp.jpg`),
+  //     loader.loadAsync(`${texturePath}metal.jpg`),
+  //   ])
+  //     .then(([colorMap, normalMap, roughnessMap, aoMap, displacementMap, metalness]) => {
+  //       // Configure all textures
+  //       [colorMap, normalMap, roughnessMap, aoMap, displacementMap, metalness].forEach(
+  //         (map) => {
+  //           map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  //           map.repeat.set(50, 50);
+  //           map.anisotropy = 16;
+  //           map.needsUpdate = true;
+  //         },
+  //       );
+
+  //       // Create material with all maps
+  //       const material = new THREE.MeshStandardMaterial({
+  //         map: colorMap,
+  //         normalMap: normalMap,
+  //         normalScale: new THREE.Vector2(1, 1),
+  //         roughnessMap: roughnessMap,
+  //         roughness: 5,
+  //         aoMap: aoMap,
+  //         aoMapIntensity: 3,
+  //         displacementMap: displacementMap,
+  //         displacementScale: 0.8,
+  //         displacementBias: -0.1,
+  //         metalness: 0,
+  //         side: THREE.DoubleSide,
+  //       });
+  //       setGroundMaterial(material);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error loading PBR textures:", error);
+  //     });
+  // }, []);
+
   useEffect(() => {
     const loader = new THREE.TextureLoader();
-    const texturePath = "/src/assets/Grass005_1K-JPG/";
+    // const texturePath = `/src/assets/${textureFolder}/`;
+    const texturePath = `https://3d-web-models-bucket.s3.eu-west-1.amazonaws.com/textures/${textureFolder}/`;
 
-    // Load all PBR textures
-    Promise.all([
-      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Color.jpg`),
-      loader.loadAsync(`${texturePath}Grass005_1K-JPG_NormalGL.jpg`),
-      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Roughness.jpg`),
-      loader.loadAsync(`${texturePath}Grass005_1K-JPG_AmbientOcclusion.jpg`),
-      loader.loadAsync(`${texturePath}Grass005_1K-JPG_Displacement.jpg`),
-    ])
-      .then(([colorMap, normalMap, roughnessMap, aoMap, displacementMap]) => {
-        // Configure all textures
-        [colorMap, normalMap, roughnessMap, aoMap, displacementMap].forEach(
-          (map) => {
-            map.wrapS = map.wrapT = THREE.RepeatWrapping;
-            map.repeat.set(100, 100);
-            map.anisotropy = 16; // Improves texture quality at oblique angles
-          },
-        );
+    // Define expected maps with keys matching material options
+    const textureFiles: Record<string, string[]> = {
+      map: ["color.jpg"],
+      normalMap: ["nrml.jpg"],
+      roughnessMap: ["rough.jpg"],
+      aoMap: ["ao.jpg"],
+      displacementMap: ["disp.jpg", "disp.tiff"],
+      metalnessMap: ["metal.jpg"],
+    };
 
-        // Create material with all maps
-        const material = new THREE.MeshStandardMaterial({
-          map: colorMap, // Base color
-          normalMap: normalMap, // Surface details
-          normalScale: new THREE.Vector2(1, 1), // Adjust normal intensity
-          roughnessMap: roughnessMap, // Surface smoothness
-          roughness: 2, // Default roughness
-          aoMap: aoMap, // Ambient occlusion
-          aoMapIntensity: 1, // AO strength
-          displacementMap: displacementMap, // Height displacement
-          displacementScale: 0.2, // Increased for more visible grass variation
-          displacementBias: -0.1,
-          metalness: 0, // Non-metallic surface
-          side: THREE.DoubleSide, // Render both sides
-        });
+    const loadedTextures: Record<string, THREE.Texture> = {};
 
-        setGroundMaterial(material);
-      })
-      .catch((error) => {
-        console.error("Error loading PBR textures:", error);
+    const loadTextureIfExists = async (
+      key: string,
+      filenames: string[],
+    ): Promise<void> => {
+      for (const filename of filenames) {
+        try {
+          const url = `${texturePath}${filename}`;
+          const res = await fetch(url);
+          if (!res.ok) continue;
+
+          const texture = await loader.loadAsync(url);
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.repeat.set(50, 50);
+          texture.anisotropy = 16;
+          texture.needsUpdate = true;
+
+          loadedTextures[key] = texture;
+          break; // Stop after first valid texture
+        } catch (err) {
+          console.warn(`Skipping ${key} (${filename}) - ${err}`);
+        }
+      }
+    };
+
+    (async () => {
+      await Promise.all(
+        Object.entries(textureFiles).map(([key, filenames]) =>
+          loadTextureIfExists(key, filenames),
+        ),
+      );
+
+      const material = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        metalness: 0.2,
+        roughness: 1,
+        ...loadedTextures,
+        displacementScale: 0.8,
+        displacementBias: -0.35,
+        aoMapIntensity: 3,
       });
-  }, []);
+
+      setGroundMaterial(material);
+    })();
+  }, [textureFolder]);
 
   useEffect(() => {
     let loader: any;
@@ -164,6 +228,13 @@ export const Model: React.FC<ModelProps> = ({
         );
         position.setZ(i, position.getZ(i) * scale);
       }
+
+      for (let i = 0; i < position.count; i++) {
+        position.setX(i, position.getX(i) - center.x); // Vycentruje geometriu
+        position.setY(i, position.getY(i) - center.y); // Vycentruje geometriu
+        position.setZ(i, position.getZ(i) - center.z); // Vycentruje geometriu
+      }
+
       position.needsUpdate = true;
 
       return scaledGeometry;
@@ -184,7 +255,7 @@ export const Model: React.FC<ModelProps> = ({
             receiveShadow
             castShadow
           >
-            <planeGeometry args={[500, 500, 128, 128]} />
+            <planeGeometry args={[500, 500, 1024, 1024]} />
             <primitive object={groundMaterial} attach="material" />
           </mesh>
         )}

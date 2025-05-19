@@ -79,3 +79,5 @@ export const TORUS_COMBINATIONS = {
   color1: ["#EBEDF2", "#00FFFF", "#AACCAA"],
   color2: ["#FF2B34", "#00FFFF", "#AACCAA"],
 };
+
+export const TEXTURES = ["grass", "concrete", "chips", "sand"];

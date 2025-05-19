@@ -30,6 +30,7 @@ export default function ModelPage() {
     { id: string; author: string; url: string; folder: string }[]
   >([]);
 
+  const [textureFolder, setTextureFolder] = useState("grass");
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [autoSwitch, setAutoSwitch] = useState(true);
@@ -136,6 +137,7 @@ export default function ModelPage() {
   useEffect(() => {
     socket.on("settings_update", (data) => {
       setAutoSwitch(data.autoSwitch);
+      setTextureFolder(data.txtrFolder);
     });
     return () => {
       socket.off("settings_update");
@@ -184,7 +186,10 @@ export default function ModelPage() {
             {!loading &&
             currentModelList.length > 0 &&
             currentModelList[currentModelIndex] ? (
-              <Model url={currentModelList[currentModelIndex].url} />
+              <Model
+                url={currentModelList[currentModelIndex].url}
+                textureFolder={textureFolder}
+              />
             ) : (
               <TorusLoad colors={TORUS_COMBINATIONS.color2} />
             )}

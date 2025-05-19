@@ -11,11 +11,19 @@ import {
   DEG2RAD,
   DEGREES_PHI,
   DEGREES_THETA,
+  TEXTURES,
 } from "../utils/Constants";
 import { socket } from "@/main";
 import { Slider } from "../ui/slider";
 import { ColorPicker } from "../ui/color-picker";
 import { SelectModels } from "./SeletModels";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const SidebarAndModal = ({
   hasControl,
@@ -47,7 +55,7 @@ const SidebarAndModal = ({
     lightIntensity: 1,
     autoSwitch: true,
     lightColor: "#ffffff",
-    isUsers: true,
+    txtrFolder: "grass",
   });
 
   const [settingsCamera, setSettingsCamera] = useState({
@@ -333,6 +341,22 @@ const SidebarAndModal = ({
               disabled={!selectedFile}
               setAutoChange={updateSetting}
             />
+            <Select
+              value={settings.txtrFolder}
+              onValueChange={(value) => updateSetting("txtrFolder", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Texture" />
+              </SelectTrigger>
+              <SelectContent>
+                {TEXTURES.map((txtr) => (
+                  <SelectItem key={txtr} value={txtr}>
+                    {txtr}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
             <div className="flex flex-row items-center justify-center gap-4">
               <label className="flex flex-row items-center justify-center gap-2 text-white">
