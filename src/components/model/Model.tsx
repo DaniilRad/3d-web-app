@@ -81,7 +81,8 @@ export const Model: React.FC<ModelProps> = ({
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     // const texturePath = `/src/assets/${textureFolder}/`;
-    const texturePath = `https://3d-web-models-bucket.s3.eu-west-1.amazonaws.com/textures/${textureFolder}/`;
+    // const texturePath = `https://3d-web-models-bucket.s3.eu-west-1.amazonaws.com/textures/${textureFolder}/`;
+    const texturePath = `https://3d-web-models-bucket.s3.eu-north-1.amazonaws.com/textures${textureFolder}/`;
 
     // Define expected maps with keys matching material options
     const textureFiles: Record<string, string[]> = {
