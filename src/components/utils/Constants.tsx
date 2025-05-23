@@ -81,3 +81,28 @@ export const TORUS_COMBINATIONS = {
 };
 
 export const TEXTURES = ["grass", "concrete", "chips", "sand"];
+export const ENVIROMENTS = ["evening", "night", "overcast", "sunset"];
+
+export const TXTR_MAP_PRESETS: Record<
+  string,
+  {
+    displacementScale: number;
+    displacementBias: number;
+    aoMapIntensity?: number;
+  }
+> = {
+  concrete: { displacementScale: 0.0, displacementBias: 0.0 },
+  grass: { displacementScale: 0.5, displacementBias: -0.1 },
+  sand: { displacementScale: 0.6, displacementBias: -0.2 },
+  chipped: { displacementScale: 0.8, displacementBias: -0.3 },
+};
+
+export const ENV_LIGHT_PRESETS: Record<
+  string,
+  { spotIntensity: number; hemiIntensity: number; color: number }
+> = {
+  evening: { spotIntensity: 0.6, hemiIntensity: 0.2, color: 0xffd9a5 },
+  night: { spotIntensity: 0.3, hemiIntensity: 0.1, color: 0x8899ff },
+  overcast: { spotIntensity: 1.0, hemiIntensity: 0.6, color: 0xd8d8d8 },
+  sunset: { spotIntensity: 0.8, hemiIntensity: 0.3, color: 0xffb07c },
+};

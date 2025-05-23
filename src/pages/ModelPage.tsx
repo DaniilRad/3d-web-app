@@ -31,6 +31,7 @@ export default function ModelPage() {
   >([]);
 
   const [textureFolder, setTextureFolder] = useState("grass");
+  const [envFolder, setEnvFolder] = useState("night");
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [autoSwitch, setAutoSwitch] = useState(true);
@@ -138,6 +139,7 @@ export default function ModelPage() {
     socket.on("settings_update", (data) => {
       setAutoSwitch(data.autoSwitch);
       setTextureFolder(data.txtrFolder);
+      setEnvFolder(data.envFolder);
     });
     return () => {
       socket.off("settings_update");
@@ -181,7 +183,7 @@ export default function ModelPage() {
       <div className="z-40 flex-1">
         <Canvas>
           <PerspectiveCamera ref={cameraRef} makeDefault />
-          <Light isHelper={false} />
+          <Light isHelper={false} envFolder={envFolder} />
           <Suspense fallback={<TorusLoad colors={TORUS_COMBINATIONS.color1} />}>
             {!loading &&
             currentModelList.length > 0 &&

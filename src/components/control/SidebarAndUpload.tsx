@@ -11,6 +11,8 @@ import {
   DEG2RAD,
   DEGREES_PHI,
   DEGREES_THETA,
+  ENV_LIGHT_PRESETS,
+  ENVIROMENTS,
   TEXTURES,
 } from "../utils/Constants";
 import { socket } from "@/main";
@@ -56,6 +58,7 @@ const SidebarAndModal = ({
     autoSwitch: true,
     lightColor: "#ffffff",
     txtrFolder: "grass",
+    envFolder: "night",
   });
 
   const [settingsCamera, setSettingsCamera] = useState({
@@ -80,6 +83,14 @@ const SidebarAndModal = ({
   const handleFileRemove = () => {
     setSelectedFile(null);
   };
+
+  useEffect(() => {
+    const preset = ENV_LIGHT_PRESETS[settings.envFolder];
+    if (preset) {
+      updateSetting("lightIntensity", preset.spotIntensity);
+      updateSetting("lightColor", `#${preset.color.toString(16)}`);
+    }
+  }, []);
 
   const handleUpload = async () => {
     if (!selectedFile) return;
@@ -341,21 +352,54 @@ const SidebarAndModal = ({
               disabled={!selectedFile}
               setAutoChange={updateSetting}
             />
-            <Select
-              value={settings.txtrFolder}
-              onValueChange={(value) => updateSetting("txtrFolder", value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Texture" />
-              </SelectTrigger>
-              <SelectContent>
-                {TEXTURES.map((txtr) => (
-                  <SelectItem key={txtr} value={txtr}>
-                    {txtr}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="bg-mediumGray mt-2 h-[1px] w-full md:block" />
+
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
+              Select Ground
+              <Select
+                value={settings.txtrFolder}
+                onValueChange={(value) => updateSetting("txtrFolder", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Texture" />
+                </SelectTrigger>
+                <SelectContent className="text-lightGray bg-black/50 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%]">
+                  {TEXTURES.map((txtr) => (
+                    <SelectItem key={txtr} value={txtr}>
+                      {txtr}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
+            <label className="flex flex-col items-center justify-center gap-2 text-white">
+              Select Enviroment
+              <Select
+                value={settings.envFolder}
+                onValueChange={(value) => {
+                  updateSetting("envFolder", value);
+                  const preset = ENV_LIGHT_PRESETS[value];
+                  if (preset) {
+                    updateSetting("lightIntensity", preset.spotIntensity);
+                    updateSetting(
+                      "lightColor",
+                      `#${preset.color.toString(16)}`,
+                    );
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Enviroment" />
+                </SelectTrigger>
+                <SelectContent className="text-lightGray bg-black/50 backdrop-blur-[15px] backdrop-brightness-[60%] backdrop-saturate-[50%]">
+                  {ENVIROMENTS.map((env) => (
+                    <SelectItem key={env} value={env}>
+                      {env}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
 
             <div className="bg-mediumGray my-2 h-[1px] w-full md:block" />
             <div className="flex flex-row items-center justify-center gap-4">

@@ -20,6 +20,27 @@ export default function AdminPage() {
   const [localCurrentModelIndex, setLocalCurrentModelIndex] = useState(0);
   const [isChooseModel, setIsChooseModel] = useState(false);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    socket.on("login_success", () => {
+      setIsLoggedIn(true);
+    });
+    socket.on("login_failed", ({ message }) => {
+      setError(message);
+    });
+    return () => {
+      socket.off("login_success");
+      socket.off("login_failed");
+    };
+  }, []);
+
+  const handleLogin = () => {
+    socket.emit("admin_login", loginForm);
+  };
+
   useEffect(() => {
     socket.on("update_index", (currentIndex) => {
       if (currentIndex) {
@@ -108,6 +129,38 @@ export default function AdminPage() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="bg-deepBlack text-lightGray flex h-screen items-center justify-center">
+        <div className="flex flex-col gap-4 rounded-2xl border p-8">
+          <h1 className="text-3xl">Admin Login</h1>
+          <input
+            type="text"
+            placeholder="Username"
+            value={loginForm.username}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, username: e.target.value })
+            }
+            className="text-lightGray mt-2 rounded-md border p-2 text-sm"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={loginForm.password}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, password: e.target.value })
+            }
+            className="text-lightGray mt-2 rounded-md border p-2 text-sm"
+          />
+          <Button onClick={handleLogin} variant={"outline"} className="mt-2">
+            Login
+          </Button>
+          {error && <p className="text-red-500">{error}</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-deepBlack font-tech-mono text-lightGray relative flex h-screen flex-col gap-4 p-4">
       <p className="flex w-full items-center justify-center text-3xl">
@@ -137,7 +190,7 @@ export default function AdminPage() {
                       setIsChooseModel(!isChooseModel);
                     }
                   }}
-                  className={`${currentModelIndex === index && currentModelList === localCurrentModelList && "text-neonBlue hover:bg-neonBlue hover:text-deepBlack hover:border-neonBlue"}`}
+                  className={`overflow-hidden text-ellipsis whitespace-nowrap ${currentModelIndex === index && currentModelList === localCurrentModelList && "text-neonBlue hover:bg-neonBlue hover:text-deepBlack hover:border-neonBlue"}`}
                 >
                   {model.id}
                 </Button>

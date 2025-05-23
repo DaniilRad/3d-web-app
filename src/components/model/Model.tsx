@@ -7,6 +7,8 @@ import {
   OBJLoader,
   FBXLoader,
 } from "three/examples/jsm/Addons.js";
+import { Ground } from "./Ground";
+import { TXTR_MAP_PRESETS } from "../utils/Constants";
 
 export interface ModelProps {
   url: string;
@@ -26,11 +28,16 @@ export const Model: React.FC<ModelProps> = ({
   >(null);
   const [groundMaterial, setGroundMaterial] =
     useState<THREE.MeshStandardMaterial | null>(null);
+  const [loadingTextures, setLoadingTextures] = useState<boolean>(true); // Track texture loading state
 
   const [material] = useState(
     () => new THREE.MeshStandardMaterial({ color: "#fef" }),
   );
   const groupRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    setLoadingTextures(true);
+  }, [textureFolder]);
 
   // useEffect(() => {
   //   const loader = new THREE.TextureLoader();
@@ -80,9 +87,12 @@ export const Model: React.FC<ModelProps> = ({
 
   useEffect(() => {
     const loader = new THREE.TextureLoader();
-    // const texturePath = `/src/assets/${textureFolder}/`;
-    // const texturePath = `https://3d-web-models-bucket.s3.eu-west-1.amazonaws.com/textures/${textureFolder}/`;
     const texturePath = `https://3d-web-models-bucket.s3.eu-north-1.amazonaws.com/textures/${textureFolder}/`;
+
+    const preset = TXTR_MAP_PRESETS[textureFolder] || {
+      displacementScale: 0.5,
+      displacementBias: -0.2,
+    };
 
     // Define expected maps with keys matching material options
     const textureFiles: Record<string, string[]> = {
@@ -108,7 +118,7 @@ export const Model: React.FC<ModelProps> = ({
 
           const texture = await loader.loadAsync(url);
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.set(50, 50);
+          texture.repeat.set(100, 100);
           texture.anisotropy = 16;
           texture.needsUpdate = true;
 
@@ -132,12 +142,13 @@ export const Model: React.FC<ModelProps> = ({
         metalness: 0.2,
         roughness: 1,
         ...loadedTextures,
-        displacementScale: 0.8,
-        displacementBias: -0.35,
-        aoMapIntensity: 3,
+        displacementScale: preset.displacementScale,
+        displacementBias: preset.displacementBias,
+        aoMapIntensity: preset.aoMapIntensity ?? 3,
       });
 
       setGroundMaterial(material);
+      setLoadingTextures(false);
     })();
   }, [textureFolder]);
 
@@ -249,16 +260,19 @@ export const Model: React.FC<ModelProps> = ({
     <group position-y={-0.5}>
       <Center>
         {/* <Ground /> */}
-        {groundMaterial && (
+        {groundMaterial && !loadingTextures ? (
           <mesh
             position={[0, groundLevel, 0]}
             rotation={[-Math.PI / 2, groundLevel, 0]}
             receiveShadow
             castShadow
           >
-            <planeGeometry args={[500, 500, 1024, 1024]} />
+            {/* <planeGeometry args={[500, 500, 1024, 1024]} /> */}
+            <circleGeometry args={[1000, 64, 1024, 1024]} />
             <primitive object={groundMaterial} attach="material" />
           </mesh>
+        ) : (
+          <Ground />
         )}
         <Preload />
         <group ref={groupRef}>
